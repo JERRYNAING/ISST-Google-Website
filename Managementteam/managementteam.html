@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISST Organization Chart 2024</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #eef2f7;
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --card-bg: #ffffff;
+            --text-dark: #333;
+            --text-light: #666;
+            --border-dark-blue: #1a73e8;
+            --border-light-blue: #4285f4;
+            --border-pink: #ff69b4;
+            --border-cyan: #00bcd4;
+            --border-orange: #ffa500;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .chart-container {
+            position: relative;
+            z-index: 1;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .chart-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 2;
+        }
+
+        .chart-date {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            z-index: 2;
+        }
+
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            padding-top: 120px;
+            padding-bottom: 120px;
+            position: relative;
+        }
+
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            position: relative;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 6px 15px var(--shadow-medium);
+            transition: all 0.3s ease;
+            min-width: 220px;
+            max-width: 280px;
+            text-align: left;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.sam-lim { border: 2px solid var(--border-dark-blue); }
+        .card.john-kok-president { border: 2px solid var(--border-light-blue); }
+        .card.joshika { border: 2px solid var(--border-pink); }
+        .card.jia-jun { border: 2px solid var(--border-cyan); }
+        .card.john-kok-events { border: 2px solid var(--border-orange); }
+        .card.kylie-wong { border: 2px solid var(--border-orange); }
+        .card.chloe { border: 2px solid var(--border-orange); }
+
+        .card-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--bg-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-photo {
+            transform: scale(1.1);
+        }
+
+        .card-info {
+            flex-grow: 1;
+        }
+
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .card-role {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .connecting-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .line {
+            position: absolute;
+            background-color: var(--primary-blue);
+            border-radius: 2px;
+        }
+
+        .line-vertical {
+            width: 3px;
+        }
+
+        .line-horizontal {
+            height: 3px;
+        }
+
+        .sst-logo {
+            position: absolute;
+            width: 120px;
+            height: auto;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .sst-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .sst-logo.top-right {
+            top: 40px;
+            right: 40px;
+        }
+
+        .sst-logo.bottom-left {
+            bottom: 120px;
+            left: calc(50% - 200px);
+            transform: translateX(-50%);
+        }
+
+        .sst-logo.bottom-right {
+            bottom: 40px;
+            right: calc(50% - 100px);
+            transform: translateX(50%);
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) scale(1); 
+                opacity: 0.6; 
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.2); 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.8; 
+            }
+            50% { 
+                transform: scale(1.05); 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { 
+                box-shadow: 0 0 5px rgba(26, 115, 232, 0.3); 
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(26, 115, 232, 0.6); 
+            }
+        }
+
+        .card {
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .card:hover {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 1200px) {
+            .chart-title {
+                font-size: 2.2rem;
+                top: 20px;
+                left: 20px;
+            }
+            .chart-date {
+                font-size: 1.8rem;
+                bottom: 20px;
+                right: 20px;
+            }
+            .sst-logo {
+                width: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .org-chart {
+                gap: 40px;
+                padding-top: 100px;
+                padding-bottom: 100px;
+            }
+            .level {
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+            }
+            .card {
+                min-width: unset;
+                width: 90%;
+                max-width: 300px;
+            }
+            .chart-title {
+                font-size: 1.8rem;
+                position: static;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .chart-date {
+                font-size: 1.4rem;
+                position: static;
+                text-align: center;
+                margin-top: 20px;
+            }
+            .sst-logo {
+                position: static;
+                margin: 20px auto;
+                display: block;
+            }
+            .connecting-lines {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="chart-container">
+        <h1 class="chart-title">ISST Organization Chart 2024</h1>
+        
+        <div class="sst-logo top-right">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4CAF50"/>
+                        <stop offset="100%" stop-color="#8BC34A"/>
+                    </linearGradient>
+                    <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#8D6E63"/>
+                        <stop offset="100%" stop-color="#A1887F"/>
+                    </linearGradient>
+                </defs>
+                <path d="M48 50 C45 65, 55 65, 52 50 L50 80 L48 80 Z" fill="url(#trunkGradient)"/>
+                <circle cx="50" cy="35" r="25" fill="url(#leafGradient)"/>
+                <circle cx="35" cy="45" r="15" fill="url(#leafGradient)"/>
+                <circle cx="65" cy="45" r="15" fill="url(#leafGradient)"/>
+                <path d="M50 25 L55 35 L65 35 L58 42 L60 52 L50 45 L40 52 L42 42 L35 35 L45 35 Z" fill="#FF0000"/>
+                <text x="50" y="88" font-family="Poppins, sans-serif" font-size="10" font-weight="700" fill="#333" text-anchor="middle">SST</text>
+                <text x="50" y="95" font-family="Poppins, sans-serif" font-size="4" fill="#666" text-anchor="middle">INTI SALES SUPPORT TEAM</text>
+            </svg>
+        </div>
+
+        <div class="org-chart">
+            <div class="connecting-lines" id="lines"></div>
+            
+            <!-- Level 1: Sam Lim -->
+            <div class="level">
+                <div class="card sam-lim" id="samLimCard">
+                    <img src="https://via.placeholder.com/60/1a73e8/ffffff?text=SL" alt="Sam Lim" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">SAM LIM</p>
+                        <p class="card-role">Head of ISST</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 2: John Kok (President) -->
+            <div class="level">
+                <div class="card john-kok-president" id="johnKokPresidentCard">
+                    <img src="https://via.placeholder.com/60/4285f4/ffffff?text=JK" alt="John Kok" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">JOHN KOK</p>
+                        <p class="card-role">ISST President cum<br>Head of Events & Social Media</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 3: Joshika, Jia Jun, John Kok (Events) -->
+            <div class="level">
+                <div class="card joshika" id="joshikaCard">
+                    <img src="https://via.placeholder.com/60/ff69b4/ffffff?text=JO" alt="Joshika" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">JOSHIKA</p>
+                        <p class="card-role">Head of HR</p>
+                    </div>
+                </div>
+                <div class="card jia-jun" id="jiaJunCard">
+                    <img src="https://via.placeholder.com/60/00bcd4/ffffff?text=JJ" alt="Jia Jun" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">JIA JUN</p>
+                        <p class="card-role">Head of DSS</p>
+                    </div>
+                </div>
+                <div class="card john-kok-events" id="johnKokEventsCard">
+                    <img src="https://via.placeholder.com/60/ffa500/ffffff?text=JK" alt="John Kok" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">JOHN KOK</p>
+                        <p class="card-role">Head of Events &<br>Social Media</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sst-logo bottom-left">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="leafGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4CAF50"/>
+                            <stop offset="100%" stop-color="#8BC34A"/>
+                        </linearGradient>
+                        <linearGradient id="trunkGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8D6E63"/>
+                            <stop offset="100%" stop-color="#A1887F"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M48 50 C45 65, 55 65, 52 50 L50 80 L48 80 Z" fill="url(#trunkGradient2)"/>
+                    <circle cx="50" cy="35" r="25" fill="url(#leafGradient2)"/>
+                    <circle cx="35" cy="45" r="15" fill="url(#leafGradient2)"/>
+                    <circle cx="65" cy="45" r="15" fill="url(#leafGradient2)"/>
+                    <path d="M50 25 L55 35 L65 35 L58 42 L60 52 L50 45 L40 52 L42 42 L35 35 L45 35 Z" fill="#FF0000"/>
+                    <text x="50" y="88" font-family="Poppins, sans-serif" font-size="10" font-weight="700" fill="#333" text-anchor="middle">SST</text>
+                    <text x="50" y="95" font-family="Poppins, sans-serif" font-size="4" fill="#666" text-anchor="middle">INTI SALES SUPPORT TEAM</text>
+                </svg>
+            </div>
+
+            <!-- Level 4: Kylie Wong, Chloe -->
+            <div class="level">
+                <div class="card kylie-wong" id="kylieWongCard">
+                    <img src="https://via.placeholder.com/60/ffa500/ffffff?text=KW" alt="Kylie Wong" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">KYLIE WONG</p>
+                        <p class="card-role">Asst. Head of Events</p>
+                    </div>
+                </div>
+                <div class="card chloe" id="chloeCard">
+                    <img src="https://via.placeholder.com/60/ffa500/ffffff?text=CH" alt="Chloe" class="card-photo">
+                    <div class="card-info">
+                        <p class="card-name">CHLOE</p>
+                        <p class="card-role">Asst. Head of Events</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sst-logo bottom-right">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="leafGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4CAF50"/>
+                            <stop offset="100%" stop-color="#8BC34A"/>
+                        </linearGradient>
+                        <linearGradient id="trunkGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#8D6E63"/>
+                            <stop offset="100%" stop-color="#A1887F"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M48 50 C45 65, 55 65, 52 50 L50 80 L48 80 Z" fill="url(#trunkGradient3)"/>
+                    <circle cx="50" cy="35" r="25" fill="url(#leafGradient3)"/>
+                    <circle cx="35" cy="45" r="15" fill="url(#leafGradient3)"/>
+                    <circle cx="65" cy="45" r="15" fill="url(#leafGradient3)"/>
+                    <path d="M50 25 L55 35 L65 35 L58 42 L60 52 L50 45 L40 52 L42 42 L35 35 L45 35 Z" fill="#FF0000"/>
+                    <text x="50" y="88" font-family="Poppins, sans-serif" font-size="10" font-weight="700" fill="#333" text-anchor="middle">SST</text>
+                    <text x="50" y="95" font-family="Poppins, sans-serif" font-size="4" fill="#666" text-anchor="middle">INTI SALES SUPPORT TEAM</text>
+                </svg>
+            </div>
+        </div>
+        
+        <p class="chart-date">Sep 2024</p>
+    </div>
+
+    <script>
+        // Background Canvas Animation
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class FloatingBlob {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 50 + 20;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.3 + 0.1;
+                this.color = this.getRandomColor();
+            }
+
+            getRandomColor() {
+                const colors = [
+                    'rgba(26, 115, 232, 0.1)',
+                    'rgba(66, 133, 244, 0.1)',
+                    'rgba(255, 165, 0, 0.1)',
+                    'rgba(0, 188, 212, 0.1)',
+                    'rgba(255, 105, 180, 0.1)'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                    this.speedX *= -1;
+                }
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+                    this.speedY *= -1;
+                }
+
+                this.opacity += (Math.random() - 0.5) * 0.01;
+                this.opacity = Math.max(0.05, Math.min(0.3, this.opacity));
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const blobs = [];
+        for (let i = 0; i < 8; i++) {
+            blobs.push(new FloatingBlob());
+        }
+
+        function animateBackground() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            blobs.forEach(blob => {
+                blob.update();
+                blob.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(animateBackground);
+        }
+
+        animateBackground();
+
+        // Floating Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Connecting Lines
+        function drawConnectingLines() {
+            const linesContainer = document.getElementById('lines');
+            const cardHeight = 90;
+            const cardWidth = 280;
+            const gap = 40;
+
+            // Clear existing lines
+            linesContainer.innerHTML = '';
+
+            // Sam Lim to John Kok President
+            const line1 = document.createElement('div');
+            line1.className = 'line line-vertical';
+            line1.style.left = '50%';
+            line1.style.top = '120px';
+            line1.style.height = '60px';
+            line1.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line1);
+
+            // John Kok President to Level 3
+            const line2 = document.createElement('div');
+            line2.className = 'line line-vertical';
+            line2.style.left = '50%';
+            line2.style.top = '270px';
+            line2.style.height = '60px';
+            line2.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line2);
+
+            // Horizontal line for Level 3
+            const line3 = document.createElement('div');
+            line3.className = 'line line-horizontal';
+            line3.style.left = '50%';
+            line3.style.top = '330px';
+            line3.style.width = (cardWidth * 3 + gap * 2) + 'px';
+            line3.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line3);
+
+            // Vertical lines to Level 3 cards
+            const line4 = document.createElement('div');
+            line4.className = 'line line-vertical';
+            line4.style.left = 'calc(50% - ' + (cardWidth + gap) + 'px)';
+            line4.style.top = '330px';
+            line4.style.height = '60px';
+            line4.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line4);
+
+            const line5 = document.createElement('div');
+            line5.className = 'line line-vertical';
+            line5.style.left = '50%';
+            line5.style.top = '330px';
+            line5.style.height = '60px';
+            line5.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line5);
+
+            const line6 = document.createElement('div');
+            line6.className = 'line line-vertical';
+            line6.style.left = 'calc(50% + ' + (cardWidth + gap) + 'px)';
+            line6.style.top = '330px';
+            line6.style.height = '60px';
+            line6.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line6);
+
+            // John Kok Events to Level 4
+            const line7 = document.createElement('div');
+            line7.className = 'line line-vertical';
+            line7.style.left = 'calc(50% + ' + (cardWidth + gap) + 'px)';
+            line7.style.top = '480px';
+            line7.style.height = '60px';
+            line7.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line7);
+
+            // Horizontal line for Level 4
+            const line8 = document.createElement('div');
+            line8.className = 'line line-horizontal';
+            line8.style.left = 'calc(50% + ' + (cardWidth + gap) + 'px)';
+            line8.style.top = '540px';
+            line8.style.width = (cardWidth + gap) + 'px';
+            line8.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line8);
+
+            // Vertical lines to Level 4 cards
+            const line9 = document.createElement('div');
+            line9.className = 'line line-vertical';
+            line9.style.left = 'calc(50% + ' + (cardWidth + gap) + 'px - ' + (cardWidth/2 + gap/2) + 'px)';
+            line9.style.top = '540px';
+            line9.style.height = '60px';
+            line9.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line9);
+
+            const line10 = document.createElement('div');
+            line10.className = 'line line-vertical';
+            line10.style.left = 'calc(50% + ' + (cardWidth + gap) + 'px + ' + (cardWidth/2 + gap/2) + 'px)';
+            line10.style.top = '540px';
+            line10.style.height = '60px';
+            line10.style.transform = 'translateX(-50%)';
+            linesContainer.appendChild(line10);
+        }
+
+        // Card Hover Effects
+        function addCardEffects() {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.03)';
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.25)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.15)';
+                });
+
+                card.addEventListener('click', function() {
+                    // Add click animation
+                    this.style.transform = 'translateY(-5px) scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(-8px) scale(1.03)';
+                    }, 150);
+                });
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            drawConnectingLines();
+            addCardEffects();
+
+            // Redraw lines on window resize
+            window.addEventListener('resize', function() {
+                setTimeout(drawConnectingLines, 100);
+            });
+        });
+
+        // Add some interactive effects
+        document.addEventListener('mousemove', function(e) {
+            const cards = document.querySelectorAll('.card');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            cards.forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                
+                const deltaX = (e.clientX - cardCenterX) / window.innerWidth;
+                const deltaY = (e.clientY - cardCenterY) / window.innerHeight;
+                
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                if (distance < 0.3) {
+                    const rotateX = deltaY * 10;
+                    const rotateY = deltaX * -10;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

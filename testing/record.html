@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f4f9;
+    }
+    .form-box {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+    .time-box {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Attendance Form</h2>
+    <button id="timeInBtn">Time In</button>
+    <div class="time-box" id="timeInDisplay"></div>
+
+    <button id="timeOutBtn">Time Out</button>
+    <div class="time-box" id="timeOutDisplay"></div>
+  </div>
+
+  <script>
+    const timeInBtn = document.getElementById("timeInBtn");
+    const timeOutBtn = document.getElementById("timeOutBtn");
+    const timeInDisplay = document.getElementById("timeInDisplay");
+    const timeOutDisplay = document.getElementById("timeOutDisplay");
+
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleString(); // includes date + time
+    }
+
+    timeInBtn.addEventListener("click", () => {
+      const time = getCurrentTime();
+      timeInDisplay.textContent = "Time In: " + time;
+      timeInBtn.disabled = true;
+      // TODO: send this time to Gmail (needs backend or EmailJS)
+    });
+
+    timeOutBtn.addEventListener("click", () => {
+      const time = getCurrentTime();
+      timeOutDisplay.textContent = "Time Out: " + time;
+      timeOutBtn.disabled = true;
+      // TODO: send this time to Gmail (needs backend or EmailJS)
+    });
+  </script>
+</body>
+</html>

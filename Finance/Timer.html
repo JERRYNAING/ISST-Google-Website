@@ -1,0 +1,1086 @@
+<!-- External Dependencies -->
+<!-- Google Fonts: Inter font family for typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Bootstrap 5.3.3: CSS framework for responsive grid layout -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Main Timer Container -->
+<!-- Uses Bootstrap container class for responsive width constraints -->
+<div class="timer-wrapper container">
+  <!-- Bootstrap Row: Contains left (timer) and right (actions) sections -->
+  <div class="main-container row g-4 align-items-center">
+    <!-- Left Section - Timer Display -->
+    <!-- Bootstrap Column: Full width on mobile, 7/12 width on large screens -->
+    <div class="left-section col-12 col-lg-7 mb-4 mb-lg-0">
+      <div class="timer-section">
+        <div class="timer-container">
+          <!-- Timer Header: Title and subtitle -->
+          <div class="timer-header">
+            <h1 class="timer-title">Submission Deadline</h1>
+            <p class="timer-subtitle">Complete your Form and submit before time runs out!!</p>
+          </div>
+          
+          <!-- Timer Display Section -->
+          <div class="timer-display">
+            <!-- Label above timer -->
+            <div class="timer-label">TIME REMAINING</div>
+            <!-- Main Timer Container: JavaScript updates this element -->
+            <div class="timer-main" id="timer">
+              <div class="time-display">
+                <!-- Timer Display: Shows hours, minutes, and seconds -->
+                <!-- Initial values: 24:00:00 (24 hours) -->
+                <span class="time-segment hours">24</span>
+                <span class="time-separator">:</span>
+                <span class="time-segment minutes">00</span>
+                <span class="time-separator">:</span>
+                <span class="time-segment seconds">00</span>
+              </div>
+            </div>
+            
+            <!-- Progress Bar Section -->
+            <!-- Shows visual representation of time remaining -->
+            <div class="progress-container">
+              <div class="progress-bar">
+                <!-- Progress Fill: Width updates dynamically via JavaScript -->
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+              <!-- Progress Text: Shows percentage remaining -->
+              <div class="progress-text">
+                <span id="progressPercent">100%</span> remaining
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Section - Action Buttons and Status -->
+    <!-- Bootstrap Column: Full width on mobile, 5/12 width on large screens -->
+    <div class="right-section col-12 col-lg-5">
+      <!-- Action Buttons Section -->
+      <!-- Bootstrap Grid: Vertical stack with gap spacing -->
+      <div class="action-section d-grid gap-3">
+        <!-- Status Indicator: Shows "Active" or "Expired" with animated dot -->
+        <div class="status-indicator" id="statusIndicator">
+          <!-- Animated status ring with pulsing dot -->
+          <div class="status-ring">
+            <div class="status-dot"></div>
+            <div class="status-pulse"></div>
+          </div>
+          <!-- Status text: Updated by JavaScript ("Active" or "Expired") -->
+          <span class="status-text">Active</span>
+          <!-- Rocket icon: Appears on hover -->
+          <div class="status-rocket" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 19c1.5-1.5 3.5-2.5 5.5-3l3.5-3.5c1.5-1.5 2.5-3.5 3-5.5-2 .5-4 1.5-5.5 3L8 13.5c-.5 2-1.5 4-3 5.5z"/>
+              <path d="M14 10l-4 4"/>
+              <path d="M7 7l2 2"/>
+            </svg>
+          </div>
+          <!-- Twinkling stars animation -->
+          <div class="status-stars" aria-hidden="true">
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+          </div>
+        </div>
+        
+        <!-- Download Button: Links to Google Sheets form -->
+        <a id="downloadBtn" class="action-btn download-btn w-100" href="https://docs.google.com/spreadsheets/d/1pMJRJuyBYPY_FtEtLjlPsbXe1KKdMdHe/edit?usp=sharing&ouid=105085624906231068634&rtpof=true&sd=true" target="_blank" rel="noopener">
+          <div class="download-button">
+            <!-- Download icon -->
+            <div class="button-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+            <!-- Button text content -->
+            <div class="button-content">
+              <span class="button-title">Download Form</span>
+              <span class="button-subtitle">Get the form template</span>
+            </div>
+            <!-- Arrow icon (moves on hover) -->
+            <div class="button-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+        </a>
+
+        <!-- Submit Button: Links to Google Sheets form -->
+        <a id="submitBtn" class="action-btn submit-btn w-100" href="https://docs.google.com/spreadsheets/d/1pMJRJuyBYPY_FtEtLjlPsbXe1KKdMdHe/edit?usp=sharing&ouid=105085624906231068634&rtpof=true&sd=true" target="_blank" rel="noopener">
+          <div class="submit-button">
+            <!-- Checkmark icon -->
+            <div class="button-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22,4 12,14.01 9,11.01"/>
+              </svg>
+            </div>
+            <!-- Button text content -->
+            <div class="button-content">
+              <span class="button-title">Submit Form</span>
+              <span class="button-subtitle">Send your completed form</span>
+            </div>
+            <!-- Arrow icon (moves on hover) -->
+            <div class="button-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ============================================
+     CSS VARIABLES (Custom Properties)
+     ============================================ */
+  /* These variables define the color scheme and design tokens used throughout the page */
+  :root {
+    /* Primary Colors: Indigo theme */
+    --primary: #6366f1;        /* Main indigo color for timer and primary elements */
+    --primary-dark: #4f46e5;  /* Darker indigo for hover states */
+    --primary-light: #818cf8; /* Lighter indigo for accents */
+    
+    /* Status Colors */
+    --success: #10b981;        /* Green for active status */
+    --success-dark: #059669;  /* Darker green */
+    --warning: #f59e0b;        /* Orange for warnings */
+    --danger: #ef4444;         /* Red for expired/danger states */
+    
+    /* Text Colors */
+    --text-dark: #1f2937;      /* Dark gray for headings */
+    --text-medium: #6b7280;    /* Medium gray for body text */
+    --text-light: #9ca3af;     /* Light gray for secondary text */
+    
+    /* Background Colors */
+    --white: #ffffff;          /* White background */
+    --gray-50: #f9fafb;        /* Very light gray */
+    --gray-100: #f3f4f6;       /* Light gray */
+    --gray-200: #e5e7eb;       /* Medium-light gray */
+    
+    /* Shadow Definitions: Different elevation levels */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);  /* Small shadow */
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);  /* Medium shadow */
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);  /* Large shadow */
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);  /* Extra large shadow */
+    
+    /* Typography */
+    --font: 'Inter', sans-serif;  /* Primary font family */
+  }
+
+  /* ============================================
+     GLOBAL RESET
+     ============================================ */
+  /* Removes default margins, padding, and sets box-sizing for consistent sizing */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* ============================================
+     BODY STYLING
+     ============================================ */
+  /* Main page container with gradient background and centered content */
+  body {
+    font-family: var(--font);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);  /* Light blue-gray gradient */
+    min-height: 100vh;  /* Full viewport height */
+    display: flex;
+    align-items: center;  /* Vertical centering */
+    justify-content: center;  /* Horizontal centering */
+    padding: 2rem;  /* Padding around content */
+  }
+
+  /* ============================================
+     TIMER WRAPPER
+     ============================================ */
+  /* Container that holds the entire timer component */
+  .timer-wrapper {
+    width: 100%;
+    max-width: 1200px;  /* Maximum width constraint */
+  }
+
+  /* ============================================
+     LEFT SECTION - TIMER DISPLAY
+     ============================================ */
+  /* White card containing the countdown timer */
+  .left-section {
+    background: var(--white);
+    border-radius: 24px;  /* Rounded corners */
+    box-shadow: var(--shadow-xl);  /* Large shadow for depth */
+    overflow: hidden;  /* Clips content to rounded corners */
+  }
+
+  /* Timer Section: Inner padding for the timer card */
+  .timer-section {
+    padding: 3rem;
+  }
+
+  /* Timer Header: Contains title and subtitle */
+  .timer-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  /* Main Timer Title */
+  .timer-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
+
+  /* Timer Subtitle: Instructions text */
+  .timer-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-medium);
+  }
+
+  /* Timer Display Container */
+  .timer-display {
+    text-align: center;
+  }
+
+  /* "TIME REMAINING" Label */
+  .timer-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  /* Main Timer Container */
+  .timer-main {
+    margin-bottom: 2rem;
+  }
+
+  /* Time Display: Hours:Minutes:Seconds */
+  .time-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 4.5rem;  /* Large font for visibility */
+    font-weight: 900;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;  /* Monospaced numbers for consistent width */
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+
+  /* Individual Time Segment (hours, minutes, seconds) */
+  .time-segment {
+    display: inline-block;
+    transition: all 0.3s ease;
+    min-width: 1.2em;  /* Prevents layout shift when numbers change */
+    text-align: center;
+  }
+
+  /* Warning State: Orange color with shake animation */
+  .time-segment.warning {
+    color: var(--warning);
+    animation: shake 0.5s ease-in-out;
+  }
+
+  /* Danger State: Red color with continuous shake animation */
+  .time-segment.danger {
+    color: var(--danger);
+    animation: shake 0.3s ease-in-out infinite;
+  }
+
+  /* Time Separator: Colon between time segments */
+  .time-separator {
+    opacity: 0.7;
+    font-weight: 700;
+  }
+
+  /* Progress Container: Wrapper for progress bar */
+  .progress-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Progress Bar: Background track */
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--gray-200);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Progress Fill: Animated bar showing remaining time */
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);  /* Indigo to green gradient */
+    border-radius: 5px;
+    transition: width 0.3s ease;  /* Smooth width transitions */
+    width: 100%;  /* Starts at 100%, decreases as time runs out */
+  }
+
+  /* Progress Text: Percentage display */
+  .progress-text {
+    font-size: 0.875rem;
+    color: var(--text-medium);
+    font-weight: 500;
+  }
+
+  /* ============================================
+     RIGHT SECTION - ACTION BUTTONS
+     ============================================ */
+  /* Container for status indicator and action buttons */
+  .right-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Action Section: Contains status and buttons */
+  .action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Status Indicator: Shows "Active" or "Expired" status */
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    background: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Animated Border: Rotating conic gradient border effect */
+  .status-indicator::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1px; 
+    background: conic-gradient(from 0deg, rgba(16,185,129,0.1), rgba(16,185,129,0.4), rgba(16,185,129,0.1));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; /* Safari */
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: spin-border 6s linear infinite;  /* Rotating border animation */
+    pointer-events: none;
+  }
+
+  /* Breathing Glow: Pulsing background glow effect */
+  .status-indicator::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: radial-gradient(circle at 50% 50%, rgba(16,185,129,0.15), transparent 60%);
+    filter: blur(8px);
+    animation: breathe 4s ease-in-out infinite;  /* Breathing/pulsing animation */
+    pointer-events: none;
+  }
+
+  /* Status Ring: Container for status dot and pulse */
+  .status-ring {
+    position: relative;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Status Dot: Central pulsing dot */
+  .status-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--success);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* Status Pulse: Expanding ring around dot */
+  .status-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--success);
+    border-radius: 50%;
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+
+  /* Status Rocket: Hover animation icon */
+  .status-rocket {
+    width: 24px;
+    height: 24px;
+    color: var(--success);
+    opacity: 0.8;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+  }
+
+  /* Status Stars: Twinkling star decorations */
+  .status-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .status-stars .star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(16,185,129,0.8);
+    border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+
+  /* Star Positions: Four stars at different corners */
+  .status-stars .star:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+  .status-stars .star:nth-child(2) { top: 30%; right: 25%; animation-delay: 0.5s; }
+  .status-stars .star:nth-child(3) { bottom: 25%; left: 35%; animation-delay: 1s; }
+  .status-stars .star:nth-child(4) { bottom: 20%; right: 20%; animation-delay: 1.5s; }
+
+  /* Status Indicator Hover: Rocket animation on hover */
+  .status-indicator:hover .status-rocket {
+    transform: translateX(8px) translateY(-4px) rotate(15deg);
+    opacity: 1;
+  }
+
+  /* ============================================
+     ACTION BUTTONS - BASE STYLES
+     ============================================ */
+  /* Base styles for all action buttons */
+  .action-btn {
+    display: block;
+    text-decoration: none;
+    position: relative;
+  }
+
+  /* ============================================
+     DOWNLOAD BUTTON STYLES
+     ============================================ */
+  /* Download Button: Purple gradient button with shimmer effect */
+  .download-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: var(--white);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .download-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .download-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+  }
+
+  .download-button:hover::before {
+    left: 100%;
+  }
+
+  .download-button .button-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .download-button:hover .button-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .download-button .button-content {
+    flex: 1;
+  }
+
+  .download-button .button-title {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .download-button .button-subtitle {
+    display: block;
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+
+  .download-button .button-arrow {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+  }
+
+  .download-button:hover .button-arrow {
+    transform: translateX(5px);
+  }
+
+  /* ============================================
+     SUBMIT BUTTON STYLES
+     ============================================ */
+  /* Submit Button: White button with green border and fill effect */
+  .submit-button {
+    background: var(--white);
+    border: 3px solid var(--success);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: var(--text-dark);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .submit-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--success);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: 1;
+  }
+
+  .submit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+    color: var(--white);
+  }
+
+  .submit-button:hover::before {
+    transform: scaleX(1);
+  }
+
+  .submit-button .button-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--success);
+    border-radius: 12px;
+    padding: 0.5rem;
+    color: var(--white);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+  }
+
+  .submit-button:hover .button-icon {
+    transform: scale(1.1);
+    background: var(--white);
+    color: var(--success);
+  }
+
+  .submit-button .button-content {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+  }
+
+  .submit-button .button-title {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .submit-button .button-subtitle {
+    display: block;
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+
+  .submit-button .button-arrow {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 2;
+  }
+
+  .submit-button:hover .button-arrow {
+    transform: translateX(5px);
+  }
+
+  /* ============================================
+     BUTTON STATES
+     ============================================ */
+  /* Disabled State: Applied when timer expires */
+  .action-btn.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .action-btn.disabled .download-button,
+  .action-btn.disabled .submit-button {
+    transform: none !important;
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  /* ============================================
+     KEYFRAME ANIMATIONS
+     ============================================ */
+  
+  /* Status Animations */
+  /* Pulse: Status dot pulsing effect */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+  }
+
+  /* Pulse Ring: Expanding ring around status dot */
+  @keyframes pulse-ring {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+  }
+
+  /* Twinkle: Star twinkling effect */
+  @keyframes twinkle {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.8); opacity: 1; }
+  }
+
+  /* Spin Border: Rotating border effect for status indicator */
+  @keyframes spin-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Breathe: Pulsing glow effect for status indicator */
+  @keyframes breathe {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+  }
+
+  /* Timer Animations */
+  /* Shake: Warning/danger shake effect for timer segments */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  /* ============================================
+     RESPONSIVE DESIGN
+     ============================================ */
+  /* Mobile and Tablet Styles: Adjusts layout for smaller screens */
+  @media (max-width: 768px) {
+    /* Body: Reduced padding on mobile */
+    body {
+      padding: 1rem;
+    }
+    
+    /* Main Container: Single column layout on mobile */
+    .main-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    /* Timer Section: Reduced padding on mobile */
+    .timer-section {
+      padding: 2rem;
+    }
+    
+    /* Timer Title: Smaller font size on mobile */
+    .timer-title {
+      font-size: 1.75rem;
+    }
+    
+    /* Timer Display: Smaller font size on mobile */
+    .timer-main {
+      font-size: 3.5rem;
+    }
+    
+    /* Status Indicator: Centered on mobile */
+    .status-indicator {
+      align-self: center;
+    }
+    
+    /* Action Section: Reduced gap on mobile */
+    .action-section {
+      gap: 1rem;
+    }
+  }
+</style>
+
+<script>
+  /* ============================================
+     TIMER MANAGER CLASS
+     ============================================ */
+  /**
+   * TimerManager Class
+   * Manages the countdown timer functionality, display updates, and user interactions
+   */
+  class TimerManager {
+    /**
+     * Constructor
+     * Initializes timer configuration and starts the countdown
+     */
+    constructor() {
+      // ============================================
+      // TIMER DURATION CONFIGURATION
+      // ============================================
+      // Change this value to set the countdown duration in hours
+      // Example: 24 = 24 hours, 12 = 12 hours, 1 = 1 hour
+      this.COUNTDOWN_DURATION_HOURS = 24;
+      
+      // Calculate total seconds from hours (hours * minutes * seconds)
+      this.totalSeconds = this.COUNTDOWN_DURATION_HOURS * 60 * 60;
+      
+      // Track remaining seconds (starts at totalSeconds)
+      this.remainingSeconds = this.totalSeconds;
+      
+      // Timer state management
+      this.isRunning = false;  // Whether the timer is currently running
+      this.interval = null;    // Reference to the setInterval for cleanup
+      
+      // Initialize the timer system
+      this.initializeElements();
+      this.bindEvents();
+      this.start();
+    }
+
+    // ============================================
+    // INITIALIZATION METHODS
+    // ============================================
+    
+    /**
+     * Initialize DOM Elements
+     * Gets references to all HTML elements needed for the timer functionality
+     */
+    initializeElements() {
+      // Timer display elements
+      this.timerEl = document.getElementById('timer');              // Main timer container
+      this.progressFill = document.getElementById('progressFill');  // Progress bar fill element
+      this.progressPercent = document.getElementById('progressPercent'); // Progress percentage text
+      
+      // Status indicator elements
+      this.statusIndicator = document.getElementById('statusIndicator'); // Status indicator container
+      this.statusText = this.statusIndicator.querySelector('.status-text'); // Status text ("Active", "Expired")
+      this.statusDot = this.statusIndicator.querySelector('.status-dot');   // Animated status dot
+      
+      // Action button elements
+      this.downloadBtn = document.getElementById('downloadBtn');  // Download form button
+      this.submitBtn = document.getElementById('submitBtn');     // Submit form button
+
+      // Validate that required elements exist
+      if (!this.timerEl || !this.progressFill || !this.progressPercent) {
+        console.error('Required timer elements not found');
+        return;
+      }
+    }
+
+    /**
+     * Bind Event Listeners
+     * Attaches click event handlers to the download and submit buttons
+     */
+    bindEvents() {
+      [this.downloadBtn, this.submitBtn].forEach(btn => {
+        if (btn) {
+          btn.addEventListener('click', (e) => this.handleButtonClick(e));
+        }
+      });
+    }
+
+    // ============================================
+    // TIMER CONTROL METHODS
+    // ============================================
+    
+    /**
+     * Start Timer
+     * Begins the countdown by setting up an interval that ticks every second
+     */
+    start() {
+      this.isRunning = true;
+      // Call tick() every 1000ms (1 second)
+      this.interval = setInterval(() => this.tick(), 1000);
+      // Set initial status to "Active" with green color
+      this.updateStatus('Active', '#10b981');
+    }
+
+    /**
+     * Timer Tick
+     * Called every second to decrement the timer and update the display
+     */
+    tick() {
+      // Decrease remaining seconds by 1
+      this.remainingSeconds--;
+      
+      // Check if timer has reached zero
+      if (this.remainingSeconds <= 0) {
+        this.timeUp();
+        return;
+      }
+
+      // Update the display and check for warnings
+      this.updateDisplay();
+      this.checkWarnings();
+    }
+
+    // ============================================
+    // DISPLAY UPDATE METHODS
+    // ============================================
+    
+    /**
+     * Update Display
+     * Calculates and displays hours, minutes, seconds, and progress percentage
+     */
+    updateDisplay() {
+      // Calculate time components from remaining seconds
+      const hours = Math.floor(this.remainingSeconds / 3600);           // Total hours remaining
+      const minutes = Math.floor((this.remainingSeconds % 3600) / 60);  // Minutes in current hour
+      const seconds = this.remainingSeconds % 60;                        // Seconds in current minute
+
+      // Get DOM elements for each time segment
+      const hoursEl = this.timerEl.querySelector('.hours');
+      const minutesEl = this.timerEl.querySelector('.minutes');
+      const secondsEl = this.timerEl.querySelector('.seconds');
+      
+      // Update the displayed time values (pad with zeros for 2-digit format)
+      if (hoursEl) hoursEl.textContent = this.pad(hours);
+      if (minutesEl) minutesEl.textContent = this.pad(minutes);
+      if (secondsEl) secondsEl.textContent = this.pad(seconds);
+
+      // Calculate and update progress bar percentage
+      const progressPercent = (this.remainingSeconds / this.totalSeconds) * 100;
+      
+      // Update progress bar width
+      if (this.progressFill) {
+        this.progressFill.style.width = `${progressPercent}%`;
+      }
+      
+      // Update progress percentage text
+      if (this.progressPercent) {
+        this.progressPercent.textContent = `${Math.round(progressPercent)}%`;
+      }
+    }
+
+    /**
+     * Check Warnings
+     * Displays visual warnings when time is running low
+     * Adjusts warning thresholds based on hours remaining
+     */
+    checkWarnings() {
+      // Convert remaining seconds to hours for warning checks
+      const hoursLeft = this.remainingSeconds / 3600;
+      
+      // Show warning at different thresholds
+      if (hoursLeft <= 1 && hoursLeft > 0.5) {
+        this.showWarning('Less than 1 hour remaining!');
+      } else if (hoursLeft <= 0.5 && hoursLeft > 0.1) {
+        this.showWarning('Less than 30 minutes remaining!');
+      } else if (hoursLeft <= 0.1) {
+        this.showWarning('Less than 6 minutes remaining!');
+      }
+    }
+
+    /**
+     * Show Warning
+     * Applies visual warning animation to timer segments
+     * @param {string} message - Warning message (currently not displayed, but can be used for future features)
+     */
+    showWarning(message) {
+      const hoursEl = this.timerEl.querySelector('.hours');
+      const minutesEl = this.timerEl.querySelector('.minutes');
+      const secondsEl = this.timerEl.querySelector('.seconds');
+      
+      // Add warning class to all time segments (triggers shake animation)
+      [hoursEl, minutesEl, secondsEl].forEach(el => {
+        if (el) {
+          el.classList.add('warning');
+          // Remove warning class after 1 second
+          setTimeout(() => {
+            el.classList.remove('warning');
+          }, 1000);
+        }
+      });
+    }
+
+    // ============================================
+    // TIMER STATE METHODS
+    // ============================================
+    
+    /**
+     * Time Up Handler
+     * Called when the countdown reaches zero
+     * Stops the timer, updates display, and locks buttons
+     */
+    timeUp() {
+      // Stop the timer
+      this.isRunning = false;
+      clearInterval(this.interval);
+      
+      // Get time display elements
+      const hoursEl = this.timerEl.querySelector('.hours');
+      const minutesEl = this.timerEl.querySelector('.minutes');
+      const secondsEl = this.timerEl.querySelector('.seconds');
+      
+      // Set all time segments to 00 and add danger styling (red, shaking)
+      [hoursEl, minutesEl, secondsEl].forEach(el => {
+        if (el) {
+          el.textContent = '00';
+          el.classList.add('danger');
+        }
+      });
+      
+      // Set progress bar to 0%
+      if (this.progressFill) {
+        this.progressFill.style.width = '0%';
+      }
+      
+      // Set progress text to 0%
+      if (this.progressPercent) {
+        this.progressPercent.textContent = '0%';
+      }
+
+      // Disable download and submit buttons
+      this.lockButtons();
+      // Update status to "Expired" with red color
+      this.updateStatus('Expired', '#ef4444');
+    }
+
+    /**
+     * Lock Buttons
+     * Disables the download and submit buttons when timer expires
+     */
+    lockButtons() {
+      [this.downloadBtn, this.submitBtn].forEach(btn => {
+        if (btn) {
+          btn.classList.add('disabled');
+          btn.setAttribute('aria-disabled', 'true');
+        }
+      });
+    }
+
+    // ============================================
+    // UI UPDATE METHODS
+    // ============================================
+    
+    /**
+     * Update Status Indicator
+     * Updates the status text and dot color
+     * @param {string} text - Status text to display ("Active", "Expired", etc.)
+     * @param {string} color - Color code for the status dot
+     */
+    updateStatus(text, color) {
+      // Update status text
+      if (this.statusText) {
+        this.statusText.textContent = text;
+      }
+      
+      // Update status dot color and glow effect
+      if (this.statusDot) {
+        this.statusDot.style.background = color;
+        this.statusDot.style.boxShadow = `0 0 20px ${color}`;
+      }
+    }
+
+    // ============================================
+    // EVENT HANDLER METHODS
+    // ============================================
+    
+    /**
+     * Handle Button Click
+     * Manages button click interactions and loading states
+     * @param {Event} e - Click event object
+     */
+    handleButtonClick(e) {
+      const btn = e.currentTarget;
+      
+      // Prevent action if button is disabled
+      if (btn.classList.contains('disabled')) {
+        e.preventDefault();
+        return;
+      }
+
+      // Show loading state
+      btn.classList.add('loading');
+      const buttonElement = btn.querySelector('.download-button') || btn.querySelector('.submit-button');
+      const originalContent = buttonElement.querySelector('.button-content').innerHTML;
+      buttonElement.querySelector('.button-content').innerHTML = '<span>Opening...</span>';
+      
+      // Reset loading state after 2 seconds
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        buttonElement.querySelector('.button-content').innerHTML = originalContent;
+      }, 2000);
+    }
+
+    // ============================================
+    // UTILITY METHODS
+    // ============================================
+    
+    /**
+     * Pad Number
+     * Formats numbers to always have 2 digits (e.g., 5 -> "05")
+     * @param {number} num - Number to pad
+     * @returns {string} - Padded string
+     */
+    pad(num) {
+      return num.toString().padStart(2, '0');
+    }
+  }
+
+  /* ============================================
+     INITIALIZATION
+     ============================================ */
+  /**
+   * Initialize Timer on Page Load
+   * Creates a new TimerManager instance when the DOM is fully loaded
+   */
+  document.addEventListener('DOMContentLoaded', function() {
+    new TimerManager();
+  });
+</script>

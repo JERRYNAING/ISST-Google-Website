@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HR Feedback – Your Voice Matters</title>
+
+<!-- [LABEL: CORE STYLES] All UI styling for the page -->
+<style>
+  :root{
+    --bg: #0f172a;            /* slate-900 */
+    --card: #111827;          /* gray-900 */
+    --muted: #94a3b8;         /* slate-400 */
+    --text: #e5e7eb;          /* gray-200 */
+    --accent: #22c55e;        /* green-500 */
+    --accent-2:#06b6d4;       /* cyan-500 */
+    --warn: #f59e0b;          /* amber-500 */
+    --danger:#ef4444;         /* red-500 */
+    --border:#1f2937;         /* gray-800 */
+    --focus: #38bdf8;         /* sky-400 */
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    background: radial-gradient(1400px 700px at 10% -10%, #0b1324 0%, #0f172a 40%, #0a0f1f 100%), var(--bg);
+    color:var(--text);
+    line-height:1.4;
+  }
+
+  .wrap{
+    max-width: 980px;
+    margin: 32px auto 64px;
+    padding: 0 16px;
+  }
+
+  .header{
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding:28px;
+    box-shadow: var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .header::after{
+    content:"";
+    position:absolute; inset:-2px;
+    background: radial-gradient(300px 120px at 95% -10%, rgba(34,197,94,.15), transparent 60%),
+                radial-gradient(220px 120px at 5% 120%, rgba(6,182,212,.18), transparent 60%);
+    pointer-events:none;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px; color:var(--muted);
+    border:1px solid var(--border);
+    padding:6px 10px;border-radius:999px;
+    background: rgba(255,255,255,.03);
+  }
+  .title{margin:10px 0 6px;font-size:28px;letter-spacing:.2px}
+  .subtitle{margin:0;color:var(--muted)}
+
+  .card{
+    margin-top:20px;
+    background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.015));
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Progress */
+  .progress{
+    margin: 14px 0 0; width:100%;
+    height: 10px; background:#0b1222; border:1px solid var(--border);
+    border-radius:999px; overflow:hidden;
+  }
+  .progress > div{
+    height:100%; width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .4s ease;
+  }
+  .progress-label{
+    display:flex;justify-content:space-between;align-items:center;
+    color:var(--muted); font-size:12px; margin-top:8px
+  }
+
+  /* Form */
+  form{display:grid; gap:16px}
+  fieldset{
+    border:1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding:16px; margin:0;
+  }
+  legend{
+    padding:0 8px; color:#cbd5e1; font-weight:600;
+  }
+  label{display:block; font-size:14px; color:#cbd5e1; margin-bottom:6px}
+  .help{font-size:12px;color:var(--muted); margin-top:6px}
+  input[type="text"], input[type="email"], textarea, select{
+    width:100%; background:#0a1221; color:var(--text);
+    border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; outline:none; transition:border .2s, box-shadow .2s;
+  }
+  textarea{min-height:120px; resize:vertical}
+  input:focus, textarea:focus, select:focus{
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.15);
+  }
+
+  /* Anonymous toggle */
+  .switch{
+    position:relative; display:inline-flex; align-items:center; gap:10px; cursor:pointer;
+  }
+  .switch input{display:none}
+  .sw-rail{
+    width:46px;height:26px;background:#0a1221;border:1px solid var(--border);border-radius:999px;position:relative;transition:background .2s, border .2s
+  }
+  .sw-knob{
+    position:absolute; top:2px; left:2px; width:20px; height:20px; background:#cbd5e1;border-radius:50%;
+    transition:left .2s ease, background .2s; box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)
+  }
+  .switch input:checked + .sw-rail{background:#052015; border-color: rgba(34,197,94,.5)}
+  .switch input:checked + .sw-rail .sw-knob{left:24px; background:#34d399}
+
+  /* Star rating (accessible radios) */
+  .stars{
+    display:inline-flex; gap:6px; direction: rtl;
+  }
+  .stars input{ display:none }
+  .star{
+    width:32px;height:32px;border-radius:6px;
+    display:grid;place-items:center; cursor:pointer;
+    border:1px solid var(--border);
+    background:#0a1221; transition: transform .08s ease, border .2s;
+  }
+  .star svg{width:18px;height:18px; fill:#475569}
+  .stars input:checked ~ label.star svg,
+  .star:hover svg,
+  .star:hover ~ .star svg{
+    fill: #facc15; /* amber-400 */
+  }
+  .star:active{transform: scale(.94)}
+
+  /* Likert */
+  .likert{display:flex;flex-wrap:wrap; gap:8px}
+  .chip{
+    position:relative; display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--border); padding:10px 12px; border-radius:999px;
+    background:#0a1221; cursor:pointer; user-select:none;
+  }
+  .chip input{position:absolute; inset:0; opacity:0}
+  .chip[data-checked="true"]{
+    border-color: rgba(34,197,94,.5);
+    box-shadow: inset 0 0 0 999px rgba(34,197,94,.08);
+  }
+
+  /* Inline rows */
+  .row{display:grid; gap:12px}
+  @media(min-width:700px){ .row{grid-template-columns:1fr 1fr} }
+
+  /* Footer */
+  .actions{display:flex; gap:12px; justify-content:flex-end; align-items:center; margin-top:6px}
+  .btn{
+    appearance:none; border:1px solid var(--border);
+    background:#0a1221; color:#e5e7eb;
+    padding:12px 16px; border-radius:12px; cursor:pointer;
+    transition: transform .06s ease, border .2s, box-shadow .2s;
+  }
+  .btn:hover{ border-color:#334155; box-shadow:0 6px 16px rgba(0,0,0,.25)}
+  .btn:active{ transform: translateY(1px) }
+  .btn.primary{
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-color: transparent; color:#083344; font-weight:700;
+  }
+  .btn.link{ background:transparent; border-color:transparent; color:var(--muted) }
+  .req{ color: var(--warn); font-weight:600 }
+
+  /* Character counter */
+  .counter{font-size:12px;color:var(--muted); text-align:right}
+
+  /* Error */
+  .err{ color:var(--danger); font-size:12px; margin-top:6px }
+
+  /* Success screen */
+  .success{
+    display:none; text-align:center; padding:50px 18px;
+  }
+  .success.show{ display:block; }
+  .success h2{ margin-top:16px }
+  .checkmark{
+    width:84px;height:84px;border-radius:50%; margin:0 auto;
+    background: radial-gradient(60px 60px at 50% 50%, rgba(34,197,94,.8), rgba(34,197,94,.55));
+    display:grid; place-items:center; position:relative; overflow:visible;
+    animation: pop .45s ease-out both;
+  }
+  @keyframes pop{ from{ transform:scale(.6); opacity:.6 } to{ transform:scale(1); opacity:1 } }
+  .checkmark svg{ width:44px;height:44px; fill:#052e1a }
+
+  /* Tiny confetti */
+  .confetti{ position:relative }
+  .confetti i{
+    position:absolute; top:-10px; width:6px; height:10px; border-radius:2px;
+    opacity:0; animation: drop 1s ease-in forwards;
+  }
+  @keyframes drop{
+    0%{ transform: translateY(-10px) rotate(0); opacity:0 }
+    20%{ opacity:1 }
+    100%{ transform: translateY(60px) rotate(180deg); opacity:0 }
+  }
+
+  /* Visually hidden (for accessibility) */
+  .vh{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0 }
+</style>
+
+<!-- [LABEL: EMAILJS SDK] Loads EmailJS so we can send email directly from the browser -->
+<script src="https://cdn.emailjs.com/sdk/3.11.0/email.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- [LABEL: PAGE HEADER] Title, description, progress bar -->
+    <header class="header" role="banner" aria-labelledby="pageTitle">
+      <span class="badge" aria-hidden="true">💬 Company HR</span>
+      <h1 id="pageTitle" class="title">HR Feedback — Your Voice Matters</h1>
+      <p class="subtitle">
+        This form takes ~3 minutes. Responses are reviewed by HR only. You may submit anonymously.
+      </p>
+      <div class="progress" aria-labelledby="progressLabel" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-live="polite">
+        <div id="progressBar"></div>
+      </div>
+      <div class="progress-label"><span id="progressLabel">Completion</span><span id="progressPct">0%</span></div>
+    </header>
+
+    <!-- [LABEL: MAIN CARD] Contains the form and the success screen -->
+    <main class="card" role="main">
+      <!-- [LABEL: FEEDBACK FORM] All fields the user fills in -->
+      <form id="feedbackForm" novalidate>
+        <!-- [LABEL: IDENTITY SECTION] Name, email, department -->
+        <fieldset>
+          <legend>About you</legend>
+
+          <div class="row" id="identityFields">
+            <div>
+              <label for="name">Full name <span class="muted"></span></label>
+              <input id="name" name="name" type="text" autocomplete="name" />
+            </div>
+            <div>
+              <label for="email">Student email <span class="muted"></span></label>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" />
+              <div id="emailErr" class="err" hidden>Enter a valid email.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="dept">Department <span class="req">*</span></label>
+              <select id="dept" name="dept" required>
+                <option value="" selected disabled>Select…</option>
+                <option>ISST</option>
+                <option>DSS</option>
+                <option>FINANCE</option>
+                <option>IT</option>
+                <option>EVENT</option>
+              </select>
+              <div id="deptErr" class="err" hidden>Please choose your department.</div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- [LABEL: SATISFACTION SECTION] Star rating with conditional follow-up -->
+        <fieldset>
+          <legend>Overall satisfaction</legend>
+          <label id="satLabel">How satisfied are you at work right now? <span class="req">*</span></label>
+          <div class="stars" role="radiogroup" aria-labelledby="satLabel">
+            <!-- Note: RTL order lets hover fill leftwards -->
+            <input type="radio" name="satisfaction" id="sat5" value="5" required />
+            <label for="sat5" class="star" aria-label="5 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+            <input type="radio" name="satisfaction" id="sat4" value="4" />
+            <label for="sat4" class="star" aria-label="4 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+            <input type="radio" name="satisfaction" id="sat3" value="3" />
+            <label for="sat3" class="star" aria-label="3 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+            <input type="radio" name="satisfaction" id="sat2" value="2" />
+            <label for="sat2" class="star" aria-label="2 stars">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+            <input type="radio" name="satisfaction" id="sat1" value="1" />
+            <label for="sat1" class="star" aria-label="1 star">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </label>
+          </div>
+          <div id="satErr" class="err" hidden>Please select a rating.</div>
+
+          <!-- Conditional follow-up when rating is 1 or 2 -->
+          <div id="lowSatFollowup" style="margin-top:10px" hidden>
+            <label for="lowSatText">Sorry to hear that. What could we improve right away?</label>
+            <textarea id="lowSatText" name="lowSatText" maxlength="600" placeholder="Share specific examples or situations…"></textarea>
+            <div class="counter"><span id="lowSatCount">0</span>/600</div>
+          </div>
+        </fieldset>
+
+        <!-- [LABEL: WORK ENVIRONMENT SECTION] Likert chips + free text -->
+        <fieldset>
+          <legend>Work environment</legend>
+          <label>How do you feel about the workspace & colleague </label>
+          <div class="likert" role="radiogroup" aria-label="Workspace sentiment">
+            <label class="chip"><input type="radio" name="workspace" value="Excellent"><span>Excellent 😊</span></label>
+            <label class="chip"><input type="radio" name="workspace" value="Good"><span>Good 🙂</span></label>
+            <label class="chip"><input type="radio" name="workspace" value="Okay"><span>Okay 😐</span></label>
+            <label class="chip"><input type="radio" name="workspace" value="Poor"><span>Poor 🙁</span></label>
+          </div>
+
+          <div style="margin-top:10px">
+            <label for="envText">Write down any complaint you have about colleague or anything.</label>
+            <textarea id="envText" name="envText" maxlength="500" placeholder="e.g., Someone acted harsh (his/her name), or any complaint you have "></textarea>
+            <div class="counter"><span id="envCount">0</span>/500</div>
+          </div>
+        </fieldset>
+
+        <!-- [LABEL: MANAGER & GROWTH SECTION] Two dropdowns -->
+        <fieldset>
+          <legend>PIC & Seniors</legend>
+          <div class="row">
+            <div>
+              <label for="seniorsSupport">I feel supported by my PIC/Seniors</label>
+              <select id="seniorsSupport" name="seniorsSupport">
+                <option value="" selected disabled>Select…</option>
+                <option>Strongly agree</option>
+                <option>Agree</option>
+                <option>Neutral</option>
+                <option>Disagree</option>
+                <option>Strongly disagree</option>
+              </select>
+            </div>
+            <div>
+              <label for="growth">I have opportunities to grow</label>
+              <select id="growth" name="growth">
+                <option value="" selected disabled>Select…</option>
+                <option>Strongly agree</option>
+                <option>Agree</option>
+                <option>Neutral</option>
+                <option>Disagree</option>
+                <option>Strongly disagree</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- [LABEL: FINAL THOUGHTS SECTION] Suggestions -->
+        <fieldset>
+          <legend>Final thoughts</legend>
+          <label for="suggestions">What’s one thing HR could do to improve your working experience?</label>
+          <textarea id="suggestions" name="suggestions" maxlength="700" placeholder="Your suggestion…"></textarea>
+          <div class="counter"><span id="sugCount">0</span>/700</div>
+        </fieldset>
+
+        <!-- [LABEL: FORM ACTIONS] Save/clear draft and Submit -->
+        <div class="actions">
+          <button type="button" class="btn link" id="clearDraft" title="Clear saved draft">Clear draft</button>
+          <button type="button" class="btn" id="saveDraft" title="Save progress">Save draft</button>
+          <button type="submit" class="btn primary">Submit feedback</button>
+        </div>
+        <p class="help">We never share individual answers with managers. Aggregated results only.</p>
+      </form>
+
+      <!-- [LABEL: SUCCESS STATE] Shown after successful send -->
+      <section id="success" class="success" aria-live="polite">
+        <div class="confetti" aria-hidden="true"></div>
+        <div class="checkmark">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+        </div>
+        <h2>Thanks for your feedback! 🎉</h2>
+        <p>Your responses were submitted successfully. You can close this tab.</p>
+        <button class="btn" id="newEntry">Submit another</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- === [ADDED FOR FORMSUBMIT OPTION A] Hidden iframe + relay form (no layout change) === -->
+  <iframe name="fs_iframe" id="fs_iframe" style="display:none"></iframe>
+  <form id="fsRelay" action="https://formsubmit.co/aizatwalid@gmail.com" method="POST" target="fs_iframe" hidden>
+    <!-- FormSubmit controls -->
+    <input type="hidden" name="_subject"  value="New HR Feedback">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_captcha"  value="false">
+    <!-- Optional: after-submit URL (kept empty since you show your own success UI) -->
+    <input type="hidden" name="_next"     value="">
+    <!-- Data fields (will be filled by JS before submit) -->
+    <input type="hidden" name="name">
+    <input type="hidden" name="user_email">
+    <input type="hidden" name="dept">
+    <input type="hidden" name="satisfaction">
+    <input type="hidden" name="lowSatText">
+    <input type="hidden" name="workspace">
+    <input type="hidden" name="seniorsSupport">
+    <input type="hidden" name="growth">
+    <input type="hidden" name="envText">
+    <input type="hidden" name="suggestions">
+  </form>
+
+  
+  <!-- === [END ADDED] === -->
+
+<!-- [LABEL: PAGE LOGIC + EMAIL SENDING] All interactivity and the EmailJS integration -->
+<script>
+  (function(){
+    /* [LABEL: EMAILJS CONFIG] 
+       (kept exactly as in your code — we just add a FormSubmit fallback)
+    */
+    const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';     // TODO: replace with your real public key (or leave)
+    const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';     // TODO: replace with your real service id (or leave)
+    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';   // TODO: replace with your real template id (or leave)
+
+    if (window.emailjs) {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
+
+    // [LABEL: ELEMENT HOOKS] References to DOM elements used throughout
+    const form = document.getElementById('feedbackForm');
+    const success = document.getElementById('success');
+    const progressBar = document.getElementById('progressBar');
+    const progressPct = document.getElementById('progressPct');
+    const anon = document.getElementById('anon');       // NOTE: If you add an anon toggle later, this will hook into it.
+    const identityFields = document.getElementById('identityFields');
+    const email = document.getElementById('email');
+    const emailErr = document.getElementById('emailErr');
+    const dept = document.getElementById('dept');
+    const deptErr = document.getElementById('deptErr');
+    const satErr = document.getElementById('satErr');
+    const lowSatFollowup = document.getElementById('lowSatFollowup');
+    const lowSatText = document.getElementById('lowSatText');
+
+    // Validate that all required elements exist
+    if (!form || !success || !progressBar || !progressPct || !identityFields || 
+        !email || !emailErr || !dept || !deptErr || !satErr || !lowSatFollowup || !lowSatText) {
+      console.error('Required form elements not found');
+      return;
+    }
+
+    // [LABEL: SMALL UTIL] Live character counters
+    const counter = (el, lblId) => {
+      const lbl = document.getElementById(lblId);
+      const update=()=> lbl.textContent = (el.value||'').length;
+      el.addEventListener('input', update); update();
+    };
+
+    // [LABEL: COUNTERS INIT] Attach counters to fields
+    const envText = document.getElementById('envText');
+    const suggestions = document.getElementById('suggestions');
+    
+    if (envText) counter(envText, 'envCount');
+    if (suggestions) counter(suggestions, 'sugCount');
+    if (lowSatText) counter(lowSatText, 'lowSatCount');
+
+    // [LABEL: ANON TOGGLE] Hide/show identity fields (kept as-is)
+    const toggleAnon = () => {
+      if(!anon) return; // Safeguard if anon switch not present
+      const hidden = anon.checked;
+      identityFields.style.display = hidden ? 'none' : 'grid';
+      if(hidden){
+        document.getElementById('name').value = '';
+        email.value = '';
+        emailErr.hidden = true;
+      }
+    };
+    if (anon) {
+      anon.addEventListener('change', toggleAnon);
+    }
+    toggleAnon();
+
+    // [LABEL: LIKERT CHIPS UX] Visual selection state
+    document.querySelectorAll('.chip input').forEach(input=>{
+      input.addEventListener('change', ()=>{
+        document.querySelectorAll(`.chip input[name="${input.name}"]`).forEach(i=>{
+          if (i.parentElement) {
+            i.parentElement.dataset.checked = i.checked ? 'true' : 'false';
+          }
+        });
+      });
+    });
+
+    // [LABEL: STAR RATING FOLLOW-UP] Show extra question for low ratings
+    const satRadios = Array.from(document.querySelectorAll('input[name="satisfaction"]'));
+    const handleSat = ()=>{
+      const val = satRadios.find(r=>r.checked)?.value;
+      const low = val && Number(val) <= 2;
+      if (lowSatFollowup) {
+        lowSatFollowup.hidden = !low;
+      }
+    };
+    satRadios.forEach(r=>r.addEventListener('change', handleSat));
+
+    // [LABEL: EMAIL VALIDATION] Simple regex-based check
+    email.addEventListener('input', ()=>{
+      if(!email.value) { 
+        if (emailErr) emailErr.hidden = true; 
+        return; 
+      }
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
+      if (emailErr) emailErr.hidden = ok;
+    });
+
+    // [LABEL: PROGRESS METER] Updates completion %
+    const trackableSelectors = [
+      'select#dept',
+      'input[name="satisfaction"]',
+      '#envText',
+      '#suggestions'
+    ];
+    const computeProgress = ()=>{
+      let total = trackableSelectors.length;
+      let done = 0;
+
+      if(dept && dept.value) done++;
+      if(satRadios.some(r=>r.checked)) done++;
+      
+      const envTextEl = document.getElementById('envText');
+      if(envTextEl && envTextEl.value.trim().length >= 1) done++;
+      
+      const suggestionsEl = document.getElementById('suggestions');
+      if(suggestionsEl && suggestionsEl.value.trim().length >= 1) done++;
+
+      const pct = Math.round((done/total)*100);
+      if (progressBar) progressBar.style.width = pct + '%';
+      if (progressPct) progressPct.textContent = pct + '%';
+      if (progressBar && progressBar.parentElement) {
+        progressBar.parentElement.setAttribute('aria-valuenow', String(pct));
+      }
+    };
+    form.addEventListener('input', computeProgress);
+    computeProgress();
+
+    // [LABEL: DRAFT STORAGE] Save/restore to localStorage
+    const DRAFT_KEY = 'hr-feedback-draft-v1';
+    const saveDraftBtn = document.getElementById('saveDraft');
+    const clearDraftBtn = document.getElementById('clearDraft');
+
+    const serializeForm = ()=>{
+      const data = new FormData(form);
+      if(!satRadios.some(r=>r.checked)) data.set('satisfaction','');
+      return Object.fromEntries(data.entries());
+    };
+    const hydrateForm = (obj)=>{
+      if(!obj) return;
+      Object.entries(obj).forEach(([k,v])=>{
+        const el = form.elements[k];
+        if(!el) return;
+        if(el instanceof RadioNodeList){
+          Array.from(el).forEach(r=> r.checked = (r.value === v));
+        } else if(el.type === 'checkbox'){
+          el.checked = (v === 'on' || v === true || v === 'true');
+        } else {
+          el.value = v;
+        }
+      });
+      handleSat(); computeProgress();
+      document.querySelectorAll('.chip input').forEach(inp=>{
+        if (inp.parentElement) {
+          inp.parentElement.dataset.checked = inp.checked ? 'true' : 'false';
+        }
+      });
+    };
+
+    const saveDraft = ()=>{
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(serializeForm()));
+      toast('Draft saved');
+    };
+    const clearDraft = ()=>{
+      localStorage.removeItem(DRAFT_KEY);
+      toast('Draft cleared');
+    };
+    saveDraftBtn.addEventListener('click', saveDraft);
+    clearDraftBtn.addEventListener('click', ()=>{
+      clearDraft();
+      form.reset();
+      handleSat(); computeProgress();
+      document.querySelectorAll('.chip').forEach(c=>{
+        if (c) c.dataset.checked='false';
+      });
+      toggleAnon();
+    });
+
+    // Load draft on start
+    try{
+      const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+      hydrateForm(draft);
+    }catch(e){
+      console.warn('Failed to load draft:', e);
+    }
+
+    // [LABEL: TOAST] Small notification helper
+    let toastTimer;
+    function toast(msg){
+      if (!msg) return;
+      
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style,{
+        position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+        background:'rgba(17,24,39,.95)', color:'#e5e7eb', padding:'10px 14px',
+        border:'1px solid #1f2937', borderRadius:'10px', boxShadow:'0 10px 20px rgba(0,0,0,.35)',
+        zIndex:9999, fontSize:'14px'
+      });
+      document.body.appendChild(t);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> {
+        if (t && t.parentNode) {
+          t.remove();
+        }
+      }, 1850);
+    }
+
+    /* === [ADDED] FormSubmit relay helper === */
+    function sendViaFormSubmit(payload){
+      const relay = document.getElementById('fsRelay');
+      if(!relay) return;
+
+      // Fill hidden inputs with our payload (create if missing)
+      const setVal = (name, val) => {
+        let el = relay.querySelector(`input[name="${name}"]`);
+        if(!el){
+          el = document.createElement('input');
+          el.type = 'hidden';
+          el.name = name;
+          relay.appendChild(el);
+        }
+        el.value = val ?? '';
+      };
+
+      setVal('name', payload.name);
+      setVal('user_email', payload.user_email);
+      setVal('dept', payload.dept);
+      setVal('satisfaction', payload.satisfaction);
+      setVal('lowSatText', payload.lowSatText);
+      setVal('workspace', payload.workspace);
+      setVal('seniorsSupport', payload.seniorsSupport);
+      setVal('growth', payload.growth);
+      setVal('envText', payload.envText);
+      setVal('suggestions', payload.suggestions);
+
+      // Submit to FormSubmit in the hidden iframe (no page navigation)
+      relay.submit();
+    }
+    /* === [END ADDED] === */
+
+    // [LABEL: FORM SUBMISSION + EMAILJS SEND]
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+
+      // [LABEL: VALIDATION] Keep your existing checks
+      let ok = true;
+      if (deptErr) deptErr.hidden = !!dept.value;
+      if(!dept.value) ok = false;
+
+      const satRadios = Array.from(document.querySelectorAll('input[name="satisfaction"]'));
+      const satSelected = satRadios.some(r=>r.checked);
+      if (satErr) satErr.hidden = satSelected;
+      if(!satSelected) ok = false;
+
+      if(email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){
+        if (emailErr) emailErr.hidden = false; 
+        ok = false;
+      }
+
+      if(!ok){ toast('Please complete the highlighted fields'); return; }
+
+      // [LABEL: EMAIL PAYLOAD] Map form fields to email/template variables
+      const payload = {
+        to_email: 'singhsanvesh@gmail.com',
+        name: (document.getElementById('name')?.value || '(anonymous)'),
+        user_email: email.value || '(not provided)',
+        dept: dept.value || '(not selected)',
+        satisfaction: (satRadios.find(r=>r.checked)?.value || '(not rated)'),
+        lowSatText: (document.getElementById('lowSatText')?.value || ''),
+        workspace: (document.querySelector('input[name="workspace"]:checked')?.value || '(not selected)'),
+        seniorsSupport: (document.getElementById('seniorsSupport')?.value || '(not selected)'),
+        growth: (document.getElementById('growth')?.value || '(not selected)'),
+        envText: (document.getElementById('envText')?.value || ''),
+        suggestions: (document.getElementById('suggestions')?.value || ''),
+        subject_prefix: 'New HR Feedback'
+      };
+
+      /* === [ADDED] Fallback to FormSubmit when EmailJS is not configured === */
+      const emailJsConfigured = (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY'
+                                 && EMAILJS_SERVICE_ID && EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID'
+                                 && EMAILJS_TEMPLATE_ID && EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID');
+
+      if(!emailJsConfigured){
+        sendViaFormSubmit(payload);
+        onSuccess(); // keep your existing success UI
+        return;
+      }
+      /* === [END ADDED] === */
+
+      // [LABEL: EMAILJS SEND] (kept as-is; will run if configured)
+      try{
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
+        onSuccess();
+      }catch(err){
+        console.error(err);
+        toast('Error sending email. Please try again.');
+      }
+    });
+
+    // [LABEL: SUCCESS HANDLER] Shows the thank-you screen and confetti
+    function onSuccess(){
+      localStorage.removeItem('hr-feedback-draft-v1');
+      const formElement = document.querySelector('main .card form');
+      if (formElement) formElement.style.display='none';
+      if (success) success.classList.add('show');
+      burstConfetti();
+    }
+
+    // [LABEL: NEW ENTRY BUTTON] Resets the form to submit another response
+    const newEntryBtn = document.getElementById('newEntry');
+    if (newEntryBtn) {
+      newEntryBtn.addEventListener('click', ()=>{
+        if (success) success.classList.remove('show');
+        form.reset();
+        const formElement = document.querySelector('main .card form');
+        if (formElement) formElement.style.display='grid';
+        // recompute
+        const satRadios2 = Array.from(document.querySelectorAll('input[name="satisfaction"]'));
+        const handleSat = ()=>{
+          const val = satRadios2.find(r=>r.checked)?.value;
+          const low = val && Number(val) <= 2;
+          const lowSatFollowupEl = document.getElementById('lowSatFollowup');
+          if (lowSatFollowupEl) lowSatFollowupEl.hidden = !low;
+        };
+        handleSat(); computeProgress();
+        document.querySelectorAll('.chip').forEach(c=>{
+          if (c) c.dataset.checked='false';
+        });
+        const anon = document.getElementById('anon');
+        if(anon){
+          const identityFields = document.getElementById('identityFields');
+          const email = document.getElementById('email');
+          const emailErr = document.getElementById('emailErr');
+          const hidden = anon.checked;
+          if (identityFields) identityFields.style.display = hidden ? 'none' : 'grid';
+          if(hidden){
+            const nameEl = document.getElementById('name');
+            if (nameEl) nameEl.value = '';
+            if (email) email.value = '';
+            if (emailErr) emailErr.hidden = true;
+          }
+        }
+      });
+    }
+
+    // [LABEL: CONFETTI FX] Small celebration animation
+    function burstConfetti(){
+      if (!success) return;
+      const host = success.querySelector('.confetti');
+      if (!host) return;
+      
+      host.innerHTML = '';
+      const colors = ['#22c55e','#06b6d4','#f59e0b','#ef4444','#a78bfa','#f472b6'];
+      for(let i=0;i<36;i++){
+        const p = document.createElement('i');
+        p.style.left = (Math.random()*100) + '%';
+        p.style.background = colors[i % colors.length];
+        p.style.animationDelay = (Math.random()*0.25) + 's';
+        p.style.transform = `translateY(-10px) rotate(${Math.random()*90}deg)`;
+        host.appendChild(p);
+      }
+      setTimeout(()=> {
+        if (host) host.innerHTML='';
+      }, 1400);
+    }
+
+  })();
+</script>
+</body>
+</html>

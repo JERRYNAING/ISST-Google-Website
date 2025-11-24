@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  .table-container {
+    overflow-x: auto;   /* Allows scrolling on small screens */
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 600px;   /* Prevents squishing too much on small screens */
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
+    white-space: nowrap; /* Keeps text in one line */
+  }
+  .header {
+    background-color: #f9e79f;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .sub-header {
+    background-color: #00c0c7;
+    color: black;
+    font-weight: bold;
+  }
+  .pic {
+    background-color: #f9e79f;
+    font-weight: bold;
+  }
+  .closed {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+  }
+  .bold {
+    font-weight: bold;
+  }
+
+  /* Mobile adjustments */
+  @media screen and (max-width: 768px) {
+    table {
+      font-size: 12px;
+    }
+    .header {
+      font-size: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="table-container">
+<table>
+  <!-- Title Row -->
+  <tr>
+    <th colspan="4" class="header">Open Day (29 &amp; 30 November 2025)</th>
+  </tr>
+
+  <!-- Date Row -->
+  <tr>
+    <td colspan="2" class="sub-header">August 15th 2025, Saturday</td>
+    <td colspan="2" class="sub-header">August 16th 2025, Sunday</td>
+  </tr>
+
+  <!-- PIC Row -->
+  <tr>
+    <td colspan="2" class="pic">PIC: Natalie</td>
+    <td colspan="2" class="pic">PIC: Rachel</td>
+  </tr>
+
+  <!-- Column Headers -->
+  <tr>
+    <td class="bold">Gatekeeper</td>
+    <td class="bold">Runner</td>
+    <td class="bold">Gatekeeper</td>
+    <td class="bold">Runner</td>
+  </tr>
+
+  <!-- Rows -->
+  <tr>
+    <td>1. Zi Yan</td>
+    <td>1. Hermione</td>
+    <td>1. Hiranyaddha</td>
+    <td>1. Natalie</td>
+  </tr>
+  <tr>
+    <td>2. Quek Yi Yang</td>
+    <td>2. Ng Bo Xun</td>
+    <td>2. S M Sadik Abdal</td>
+    <td>2. yunyii</td>
+  </tr>
+  <tr>
+    <td>3. S M Sadik Abdal </td>
+    <td>3. Swan</td>
+    <td>3. Darshan</td>
+    <td>3. Sharvines</td>
+  </tr>
+  <tr>
+    <td>4. cheah teik hoong</td>
+    <td>4. Richard</td>
+    <td>4. Peiyi</td>
+    <td>4. Abdur Rehman</td>
+  </tr>
+  <tr>
+    <td>5. Ming Huey</td>
+    <td>5. Sharvines</td>
+    <td>5. terrence</td>
+    <td class="closed">CLOSED</td>
+  </tr>
+  <tr>
+    <td class="closed">CLOSED</td>
+    <td>6. Marwa</td>
+    <td class="closed">CLOSED</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>7. Abdur Rehman</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>8. terrence</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td class="closed">CLOSED</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+</table>
+</div>
+
+</body>
+</html>
