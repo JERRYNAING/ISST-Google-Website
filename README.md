@@ -1,2 +1,28 @@
 # ISST-Google-Website
-Central repo for IT operations, runbooks, network docs, and automation scripts. Supports infrastructure management, troubleshooting, and standard IT workflows. Managed by the IT team.
+
+## Overview
+This website is the central repository for the **ISST (INTI Sales Support Team) Department** under the **ADCO (Admission Department and Counseling Office) Office** at **INTI COLLEGE Subang**.
+
+## Purpose
+This website serves as the primary platform for ISST organizations to manage:
+- IT operations and infrastructure management
+- Runbooks and documentation
+- Network documentation and configurations
+- Automation scripts and workflows
+- Standard IT procedures and troubleshooting guides
+- Department-specific tools and resources
+
+## Ownership and Access
+**IMPORTANT:** This repository is exclusively managed and maintained by the **ISST IT teams only**. 
+
+- **Authorized Personnel:** Only ISST IT team members have access and management rights
+- **No External Access:** No other companies, authorities, or external organizations are permitted to access, modify, or manage this repository
+- **Restricted Use:** This website is strictly for internal ISST department use within INTI COLLEGE Subang
+
+## Usage
+This website is used by ISST organizations for:
+- Centralized IT resource management
+- Documenting and sharing IT procedures
+- Managing department-specific applications and tools
+- Supporting day-to-day IT operations and workflows
+- Maintaining infrastructure documentation and runbooks
