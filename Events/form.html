@@ -323,38 +323,95 @@
      * This form uses Google Sheets as the backend database via Google Apps Script.
      * 
      * SETUP INSTRUCTIONS:
-     * 1. Create a Google Sheet with columns: Name, Role, Event, Timestamp
+     * For full setup with slot management, see:
+     * Events/SLOT_MANAGEMENT_SETUP.md
+     *
+     * Quick Steps:
+     * 1. Create a Google Sheet (see SLOT_MANAGEMENT_SETUP.md for structure)
      * 2. Create a Google Apps Script project (Extensions > Apps Script)
-     * 3. Copy the code from Events/README.md (Google Apps Script section)
+     * 3. Copy the complete script from SLOT_MANAGEMENT_SETUP.md
      * 4. Update the SPREADSHEET_ID in the script
-     * 5. Deploy as Web App:
-     *    - Click "Deploy" > "New deployment"
-     *    - Type: Web app
-     *    - Execute as: Me
-     *    - Who has access: Anyone
+     * 5. Deploy as Web App (Who has access: Anyone)
      * 6. Copy the Web App URL and paste it below
      * 
      * The URL should look like:
      * https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec
      * 
-     * For detailed setup instructions, see Events/README.md
+     * For detailed setup instructions, see Events/SLOT_MANAGEMENT_SETUP.md
      */
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOmiJ1x4m2EcmGE_FEl4Uz6-9jacA6raTh6IPTgqZzKs49TYMBrQQHH_k5JxCqU6FP/exec";
 
-    // Slot Configuration
-    // Total slots available for each role
-    // To update slot counts dynamically, modify the 'taken' values below
-    // or fetch them from your server/Google Sheets
-    const SLOT_CONFIG = {
+    /* ============================================
+       SLOT CONFIGURATION
+       ============================================ */
+    // Slot configuration - will be loaded from Google Apps Script
+    let SLOT_CONFIG = {
       runner: {
-        total: 20,        // Total slots for Runner
-        taken: 5          // Currently taken slots (update this dynamically if needed)
+        total: 20,        // Will be updated from backend
+        taken: 0          // Will be updated from backend
       },
       gatekeeper: {
-        total: 15,        // Total slots for Gatekeeper
-        taken: 3          // Currently taken slots (update this dynamically if needed)
+        total: 15,        // Will be updated from backend
+        taken: 0          // Will be updated from backend
       }
     };
+    
+    const FETCH_TIMEOUT_MS = 10000;
+    const POST_TIMEOUT_MS = 20000;
+    const SLOT_REFRESH_MS = 5000;
+    let slotFetchInFlight = false;
+
+    /**
+     * Fetch with timeout to avoid hanging requests
+     * @param {string} url - Request URL
+     * @param {RequestInit} options - Fetch options
+     * @returns {Promise<Response>}
+     */
+    function fetchWithTimeout(url, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(timeoutId));
+    }
+
+    /**
+     * Fetch slot counts from Google Apps Script
+     * This function is called on page load and after form submission
+     */
+    async function fetchSlotCounts() {
+      if (slotFetchInFlight) {
+        return;
+      }
+      slotFetchInFlight = true;
+      try {
+        const response = await fetchWithTimeout(
+          `${GOOGLE_APPS_SCRIPT_URL}?t=${Date.now()}`,
+          { method: 'GET' }
+        );
+        
+        const data = await response.json();
+        
+        if (data.ok && data.slots) {
+          // Update SLOT_CONFIG with data from backend
+          SLOT_CONFIG.runner.total = data.slots.runner.total;
+          SLOT_CONFIG.runner.taken = data.slots.runner.taken;
+          SLOT_CONFIG.gatekeeper.total = data.slots.gatekeeper.total;
+          SLOT_CONFIG.gatekeeper.taken = data.slots.gatekeeper.taken;
+          
+          // Update the display
+          updateSlotDisplay();
+        } else {
+          console.error('Failed to fetch slots:', data.error);
+        }
+      } catch (error) {
+        if (error && error.name !== 'AbortError') {
+          console.error('Error fetching slots:', error);
+        }
+        // Keep using default values if fetch fails
+      } finally {
+        slotFetchInFlight = false;
+      }
+    }
     
     // Note: In production, you may want to fetch slot counts from your backend
     // Example: fetch('/api/slots').then(res => res.json()).then(data => {
@@ -609,7 +666,7 @@
       } else {
         clearFieldError(nameField, nameError);
       }
-      
+
       // Validate Role Selection
       const roleValidationError = validateRoleSelection();
       if (roleValidationError) {
@@ -635,7 +692,12 @@
     /* ============================================
        INITIALIZE SLOT DISPLAY
        ============================================ */
-    // Update slot display on page load
+    // Fetch slot counts from backend on page load
+    fetchSlotCounts();
+    // Refresh slot counts periodically to stay in sync with Sheets
+    setInterval(fetchSlotCounts, SLOT_REFRESH_MS);
+    
+    // Also update display immediately (in case fetch is slow)
     updateSlotDisplay();
 
     /* ============================================
@@ -686,21 +748,6 @@
       nameError.textContent = '';
     });
 
-    // Clear role error when user interacts with checkboxes
-    runnerCheckbox.addEventListener('change', () => {
-      const error = validateRoleSelection();
-      if (!error) {
-        clearRoleError();
-      }
-    });
-
-    gatekeeperCheckbox.addEventListener('change', () => {
-      const error = validateRoleSelection();
-      if (!error) {
-        clearRoleError();
-      }
-    });
-
     eventField.addEventListener('input', () => {
       eventField.classList.remove('error');
       eventError.textContent = '';
@@ -748,11 +795,14 @@
 
         // Send data to Google Apps Script Web App
         // Note: Make sure your Google Apps Script is deployed with "Who has access: Anyone"
-        const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const res = await fetchWithTimeout(
+          GOOGLE_APPS_SCRIPT_URL,
+          {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          },
+          POST_TIMEOUT_MS
+        );
 
         // Google Apps Script returns JSON response
         const data = await res.json().catch(() => {
@@ -762,28 +812,40 @@
 
         if (res.ok && data.ok) {
           // Success: Show success message and reset form
-          statusEl.textContent = 'Saved! Thank you for your registration.';
+          statusEl.textContent = 'Submitted! Thank you for your registration.';
           statusEl.className = 'status ok';
+          submitBtn.textContent = 'Submitted';
           
           // Reset form and clear selections
           form.reset();
           clearAllErrors();
           
-          // Update slot display after successful submission
-          // Optionally update slot counts from server response
-          // Example: if (data.slots) { SLOT_CONFIG.runner.taken = data.slots.runner.taken; }
-          updateSlotDisplay();
+          // Update slot display with data from server response
+          if (data.slots) {
+            SLOT_CONFIG.runner.total = data.slots.runner.total;
+            SLOT_CONFIG.runner.taken = data.slots.runner.taken;
+            SLOT_CONFIG.gatekeeper.total = data.slots.gatekeeper.total;
+            SLOT_CONFIG.gatekeeper.taken = data.slots.gatekeeper.taken;
+            updateSlotDisplay();
+          } else {
+            // Fallback: fetch slots from backend
+            fetchSlotCounts();
+          }
           
-          // Reset button after a delay
+          // Reset button after a short delay
           setTimeout(() => {
             submitBtn.textContent = 'Submit';
-          }, 2000);
+          }, 1200);
         } else {
           throw new Error(data.error || 'Failed to save. Please try again.');
         }
       } catch (err) {
         // Error: Show error message
-        statusEl.textContent = 'Error: ' + err.message;
+        if (err && err.name === 'AbortError') {
+          statusEl.textContent = 'Error: Request timed out. Please try again.';
+        } else {
+          statusEl.textContent = 'Error: ' + err.message;
+        }
         statusEl.className = 'status err';
         submitBtn.textContent = 'Submit';
       } finally {

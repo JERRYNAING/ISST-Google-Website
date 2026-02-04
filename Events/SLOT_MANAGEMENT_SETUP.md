@@ -58,6 +58,8 @@ The system works as follows:
    https://docs.google.com/spreadsheets/d/SPREADSHEET_ID_HERE/edit
    ```
 2. Copy the part between `/d/` and `/edit` - that's your **Spreadsheet ID**
+"1EG9taP_SA5-FaTpzFCqb3-Bw3sSZWOoCqlRGe1SnUyw"
+
 3. Save this ID - you'll need it in the next step
 
 ---
@@ -408,6 +410,8 @@ function doPost(e) {
 6. **Copy the Web App URL** - it will look like:
    ```
    https://script.google.com/macros/s/AKfycby.../exec
+
+   https://script.google.com/macros/s/AKfycbymFi1oJ1lPXnIY5sONSTWPdF8E-IeSOJg6uhpZXghzOGm-BJKv6BHBZfXrNZhmuiUT/exec
    ```
 7. Click **Done**
 
@@ -693,6 +697,104 @@ If you need to track slots for multiple events:
 
 ---
 
+## Custom Layout App Script Update (Feb 6, 2026)
+
+Use this if you want **custom slot ranges** (e.g., Gatekeeper in `A3:A5`,
+Runner in `B2:B8`). This replaces the **counting + Sheet2 totals** approach.
+
+### Step 1: Add slot range configuration
+
+```javascript
+const SLOT_RANGES = {
+  gatekeeper: { sheet: 'Sheet1', range: 'A3:A5' },
+  runner: { sheet: 'Sheet1', range: 'B2:B8' }
+};
+```
+
+### Step 2: Add helper functions
+
+```javascript
+function getRangeValues(rangeConfig) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(rangeConfig.sheet);
+  return sheet.getRange(rangeConfig.range).getValues();
+}
+
+function findFirstEmptyIndex(values) {
+  for (let i = 0; i < values.length; i++) {
+    if (!values[i][0]) return i;
+  }
+  return -1;
+}
+
+function getAvailableSlots(rangeConfig) {
+  const values = getRangeValues(rangeConfig);
+  return values.filter(row => !row[0]).length;
+}
+```
+
+### Step 3: Replace `doGet()` with custom layout version
+
+```javascript
+function doGet() {
+  const gatekeeperAvailable = getAvailableSlots(SLOT_RANGES.gatekeeper);
+  const runnerAvailable = getAvailableSlots(SLOT_RANGES.runner);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({
+      ok: true,
+      slots: {
+        gatekeeper: { available: gatekeeperAvailable },
+        runner: { available: runnerAvailable }
+      }
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+### Step 4: Replace slot-saving part in `doPost()`
+
+```javascript
+const selectedRoles = data.role.split(',').map(r => r.trim().toLowerCase());
+
+for (const role of selectedRoles) {
+  const rangeConfig = SLOT_RANGES[role];
+  if (!rangeConfig) continue;
+
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(rangeConfig.sheet);
+  const range = sheet.getRange(rangeConfig.range);
+  const values = range.getValues();
+  const emptyIndex = findFirstEmptyIndex(values);
+
+  if (emptyIndex === -1) {
+    return ContentService.createTextOutput(JSON.stringify({
+      ok: false,
+      error: `${role} slots are full`
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Fill the first empty slot
+  range.getCell(emptyIndex + 1, 1).setValue(data.name);
+}
+
+return doGet(); // return updated slot counts
+```
+
+### Step 5: Update `form.html` slot display
+
+Because `doGet()` now returns **available only**, update the UI like this:
+
+```javascript
+if (data.ok && data.slots) {
+  SLOT_CONFIG.runner.total = data.slots.runner.available;
+  SLOT_CONFIG.runner.taken = 0;
+  SLOT_CONFIG.gatekeeper.total = data.slots.gatekeeper.available;
+  SLOT_CONFIG.gatekeeper.taken = 0;
+  updateSlotDisplay();
+}
+```
+
+---
+
 ## Support
 
 For issues:
@@ -713,3 +815,17 @@ For issues:
 ✅ **No overbooking** - system prevents full slots from being selected  
 
 The system is now fully functional and will automatically manage slots in real-time!
+
+---
+
+## Update (Feb 6, 2026) - Planning Phase (Prevention)
+
+Planned prevention improvements:
+1. **Overbooking prevention:** Use Apps Script `LockService` to serialize writes per role.
+2. **Duplicate submissions:** Add a unique key (email/ID) and reject repeats.
+3. **Abuse control:** Add basic rate limiting and optional CAPTCHA for public forms.
+4. **CORS stability:** Keep POST as simple request (no custom headers).
+5. **Cache issues:** Add cache-busting on GET (`?t=` timestamp) and periodic refresh.
+6. **Audit trail:** Log submissions with timestamps and IP/user agent (if allowed).
+7. **Data hygiene:** Validate role names strictly and normalize input strings.
+8. **Error handling:** Return clear error messages for full slots or invalid data.

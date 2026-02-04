@@ -26,3 +26,10 @@ This website is used by ISST organizations for:
 - Managing department-specific applications and tools
 - Supporting day-to-day IT operations and workflows
 - Maintaining infrastructure documentation and runbooks
+
+## Events Registration Update (Feb 5, 2026)
+Summary of the Open Day registration system work:
+- `Events/form.html` integrates Google Apps Script + Google Sheets backend.
+- Slot availability auto-updates on page load, after submit, and on interval refresh.
+- Submit flow shows faster feedback (Submitted) and handles timeouts safely.
+- `Events/SLOT_MANAGEMENT_SETUP.md` documents full setup and deployment steps.
