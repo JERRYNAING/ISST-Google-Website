@@ -33,3 +33,10 @@ Summary of the Open Day registration system work:
 - Slot availability auto-updates on page load, after submit, and on interval refresh.
 - Submit flow shows faster feedback (Submitted) and handles timeouts safely.
 - `Events/SLOT_MANAGEMENT_SETUP.md` documents full setup and deployment steps.
+
+## Events Registration Update (09 February 2026)
+Summary of the custom date-based registration updates:
+- `Events/Form1.html` supports date selection with custom slot ranges.
+- Form payload now uses name, roles, and date (event name removed).
+- Slot display updates from available-only counts and disables roles until date selected.
+- `Events/CUSTOM_SLOT_LAYOUT_GUIDE.md` includes full date-based Apps Script.

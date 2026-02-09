@@ -343,7 +343,7 @@
      * 
      * For detailed setup instructions, see Events/SLOT_MANAGEMENT_SETUP.md
      */
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwku3TpgdQVFs8x-JPPy2Kof5U--UP4jY6qSr33P6sQlzHlHa5CYG5TNdIwVahc7rjWsg/exec";
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 
     /* ============================================
        SLOT CONFIGURATION
@@ -362,7 +362,8 @@
     
     const FETCH_TIMEOUT_MS = 8000;
     const POST_TIMEOUT_MS = 15000;
-    let slotFetchInFlight = false;
+    let slotFetchController = null;
+    let slotFetchToken = 0;
 
     /**
      * Fetch with timeout to avoid hanging requests
@@ -382,22 +383,32 @@
      * This function is called on page load and after form submission
      */
     async function fetchSlotCounts() {
-      if (slotFetchInFlight) {
-        return;
-      }
       if (!dateField.value) {
         return;
       }
-      slotFetchInFlight = true;
+      const requestDate = dateField.value;
+      slotFetchToken += 1;
+      const currentToken = slotFetchToken;
+
+      if (slotFetchController) {
+        slotFetchController.abort();
+      }
+      const controller = new AbortController();
+      slotFetchController = controller;
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
       try {
-        const response = await fetchWithTimeout(
-          `${GOOGLE_APPS_SCRIPT_URL}?date=${encodeURIComponent(dateField.value)}&t=${Date.now()}`,
-          { method: 'GET' }
+        const response = await fetch(
+          `${GOOGLE_APPS_SCRIPT_URL}?date=${encodeURIComponent(requestDate)}&t=${Date.now()}`,
+          { method: 'GET', signal: controller.signal }
         );
         
         const data = await response.json();
         
         if (data.ok && data.slots) {
+          if (currentToken !== slotFetchToken || requestDate !== dateField.value) {
+            return;
+          }
           // Update SLOT_CONFIG with available counts from backend
           SLOT_CONFIG.runner.total = data.slots.runner.available;
           SLOT_CONFIG.runner.taken = 0;
@@ -415,7 +426,10 @@
         }
         // Keep using default values if fetch fails
       } finally {
-        slotFetchInFlight = false;
+        clearTimeout(timeoutId);
+        if (slotFetchController === controller) {
+          slotFetchController = null;
+        }
       }
     }
     
@@ -746,12 +760,6 @@
       } else {
         clearRoleError();
       }
-    });
-
-    // Clear date error styling on change
-    dateField.addEventListener('change', () => {
-      dateField.classList.remove('error');
-      dateError.textContent = '';
     });
 
     // Clear error styling on input (user is typing)
