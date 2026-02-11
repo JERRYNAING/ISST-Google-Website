@@ -43,6 +43,7 @@
     }
 
     input[type="text"],
+    select,
     textarea {
       width: 100%;
       padding: 10px;
@@ -54,6 +55,7 @@
     }
 
     input[type="text"]:focus,
+    select:focus,
     textarea:focus {
       border-color: #3b82f6;
       outline: none;
@@ -61,13 +63,15 @@
     }
 
     /* Error State: Red border when validation fails */
-    input[type="text"].error {
+    input[type="text"].error,
+    select.error {
       border-color: #ef4444;
       box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
     }
 
     /* Success State: Green border when valid */
-    input[type="text"].success {
+    input[type="text"].success,
+    select.success {
       border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
     }
@@ -260,6 +264,17 @@
       />
       <span id="name-error" class="error-message"></span>
 
+      <!-- Date Selection Field -->
+      <label for="event-date">Event Date:</label>
+      <select id="event-date" name="event-date">
+        <option value="" selected disabled>Select a date</option>
+        <option value="2025-05-10">10 May 2025 (Saturday)</option>
+        <option value="2025-05-11">11 May 2025 (Sunday)</option>
+        <option value="2025-05-17">17 May 2025 (Saturday)</option>
+        <option value="2025-05-18">18 May 2025 (Saturday)</option>
+      </select>
+      <span id="date-error" class="error-message"></span>
+
       <!-- Role Selection Field -->
       <label>Select Role(s):</label>
       <div id="role-selection" class="role-selection">
@@ -293,17 +308,6 @@
         </div>
       </div>
       <span id="role-error" class="error-message"></span>
-
-      <!-- Event Name Field -->
-      <label for="event">Event Name:</label>
-      <input 
-        id="event" 
-        name="event" 
-        type="text" 
-        placeholder="Enter the event name"
-        autocomplete="off"
-      />
-      <span id="event-error" class="error-message"></span>
 
       <!-- Submit Button -->
       <button id="submitBtn" type="submit">Submit</button>
@@ -347,18 +351,17 @@
     // Slot configuration - will be loaded from Google Apps Script
     let SLOT_CONFIG = {
       runner: {
-        total: 20,        // Will be updated from backend
+        total: 0,         // Will be updated from backend
         taken: 0          // Will be updated from backend
       },
       gatekeeper: {
-        total: 15,        // Will be updated from backend
+        total: 0,         // Will be updated from backend
         taken: 0          // Will be updated from backend
       }
     };
     
-    const FETCH_TIMEOUT_MS = 10000;
-    const POST_TIMEOUT_MS = 20000;
-    const SLOT_REFRESH_MS = 5000;
+    const FETCH_TIMEOUT_MS = 8000;
+    const POST_TIMEOUT_MS = 15000;
     let slotFetchInFlight = false;
 
     /**
@@ -378,14 +381,42 @@
      * Fetch slot counts from Google Apps Script
      * This function is called on page load and after form submission
      */
+    function applySlotCounts(slots) {
+      if (!slots) return;
+      const runner = slots.runner || {};
+      const gatekeeper = slots.gatekeeper || {};
+      if (typeof runner.available === 'number' && typeof gatekeeper.available === 'number') {
+        SLOT_CONFIG.runner.total = runner.available;
+        SLOT_CONFIG.runner.taken = 0;
+        SLOT_CONFIG.gatekeeper.total = gatekeeper.available;
+        SLOT_CONFIG.gatekeeper.taken = 0;
+        updateSlotDisplay();
+        return;
+      }
+      if (
+        typeof runner.total === 'number' &&
+        typeof runner.taken === 'number' &&
+        typeof gatekeeper.total === 'number' &&
+        typeof gatekeeper.taken === 'number'
+      ) {
+        SLOT_CONFIG.runner.total = runner.total;
+        SLOT_CONFIG.runner.taken = runner.taken;
+        SLOT_CONFIG.gatekeeper.total = gatekeeper.total;
+        SLOT_CONFIG.gatekeeper.taken = gatekeeper.taken;
+        updateSlotDisplay();
+      }
+    }
     async function fetchSlotCounts() {
       if (slotFetchInFlight) {
+        return;
+      }
+      if (!dateField.value) {
         return;
       }
       slotFetchInFlight = true;
       try {
         const response = await fetchWithTimeout(
-          `${GOOGLE_APPS_SCRIPT_URL}?t=${Date.now()}`,
+          `${GOOGLE_APPS_SCRIPT_URL}?date=${encodeURIComponent(dateField.value)}&t=${Date.now()}`,
           { method: 'GET' }
         );
         
@@ -393,13 +424,7 @@
         
         if (data.ok && data.slots) {
           // Update SLOT_CONFIG with data from backend
-          SLOT_CONFIG.runner.total = data.slots.runner.total;
-          SLOT_CONFIG.runner.taken = data.slots.runner.taken;
-          SLOT_CONFIG.gatekeeper.total = data.slots.gatekeeper.total;
-          SLOT_CONFIG.gatekeeper.taken = data.slots.gatekeeper.taken;
-          
-          // Update the display
-          updateSlotDisplay();
+          applySlotCounts(data.slots);
         } else {
           console.error('Failed to fetch slots:', data.error);
         }
@@ -429,7 +454,8 @@
     
     // Form fields
     const nameField = document.getElementById('name');
-    const eventField = document.getElementById('event');
+    const dateField = document.getElementById('event-date');
+    const EVENT_NAME = 'Open Day';
     
     // Role selection elements
     const roleSelection = document.getElementById('role-selection');
@@ -442,8 +468,8 @@
     
     // Error message elements
     const nameError = document.getElementById('name-error');
+    const dateError = document.getElementById('date-error');
     const roleError = document.getElementById('role-error');
-    const eventError = document.getElementById('event-error');
 
     /* ============================================
        VALIDATION FUNCTIONS
@@ -479,6 +505,18 @@
     }
 
     /**
+     * Validate Event Date Field
+     * @param {string} value - Date value to validate
+     * @returns {string|null} - Error message or null if valid
+     */
+    function validateDate(value) {
+      if (!value) {
+        return 'Event date is required';
+      }
+      return null;
+    }
+
+    /**
      * Get Available Slots for a Role
      * @param {string} role - Role name ('runner' or 'gatekeeper')
      * @returns {number} - Number of available slots
@@ -494,6 +532,15 @@
      * Updates the visual display of available slots for each role
      */
     function updateSlotDisplay() {
+      if (!dateField.value) {
+        runnerSlotsEl.className = 'slot-info slot-low';
+        runnerSlotsEl.textContent = 'Select a date';
+        runnerCheckbox.disabled = true;
+        gatekeeperSlotsEl.className = 'slot-info slot-low';
+        gatekeeperSlotsEl.textContent = 'Select a date';
+        gatekeeperCheckbox.disabled = true;
+        return;
+      }
       const runnerAvailable = getAvailableSlots('runner');
       const gatekeeperAvailable = getAvailableSlots('gatekeeper');
 
@@ -566,29 +613,6 @@
     }
 
     /**
-     * Validate Event Name Field
-     * @param {string} value - Event name value to validate
-     * @returns {string|null} - Error message or null if valid
-     */
-    function validateEvent(value) {
-      const trimmed = value.trim();
-      
-      if (!trimmed) {
-        return 'Event name is required';
-      }
-      
-      if (trimmed.length < 3) {
-        return 'Event name must be at least 3 characters long';
-      }
-      
-      if (trimmed.length > 100) {
-        return 'Event name must be less than 100 characters';
-      }
-      
-      return null;
-    }
-
-    /**
      * Display Field Error
      * @param {HTMLElement} field - Input element
      * @param {HTMLElement} errorEl - Error message element
@@ -643,8 +667,8 @@
      */
     function clearAllErrors() {
       clearFieldError(nameField, nameError);
+      clearFieldError(dateField, dateError);
       clearRoleError();
-      clearFieldError(eventField, eventError);
     }
 
     /**
@@ -666,6 +690,17 @@
       } else {
         clearFieldError(nameField, nameError);
       }
+
+      // Validate Date
+      const dateValue = dateField.value;
+      const dateValidationError = validateDate(dateValue);
+      if (dateValidationError) {
+        showFieldError(dateField, dateError, dateValidationError);
+        isValid = false;
+      } else {
+        clearFieldError(dateField, dateError);
+      }
+
       // Validate Role Selection
       const roleValidationError = validateRoleSelection();
       if (roleValidationError) {
@@ -675,26 +710,26 @@
         clearRoleError();
       }
       
-      // Validate Event Name
-      const eventValue = eventField.value;
-      const eventValidationError = validateEvent(eventValue);
-      if (eventValidationError) {
-        showFieldError(eventField, eventError, eventValidationError);
-        isValid = false;
-      } else {
-        clearFieldError(eventField, eventError);
-      }
-      
       return isValid;
     }
 
     /* ============================================
        INITIALIZE SLOT DISPLAY
        ============================================ */
-    // Fetch slot counts from backend on page load
+    // Fetch slot counts from backend when a date is selected
+    dateField.addEventListener('change', () => {
+      const error = validateDate(dateField.value);
+      if (error) {
+        showFieldError(dateField, dateError, error);
+      } else {
+        clearFieldError(dateField, dateError);
+      }
+      runnerCheckbox.checked = false;
+      gatekeeperCheckbox.checked = false;
+      fetchSlotCounts();
+    });
+    // Fetch slot counts from backend on page load (only when date is selected)
     fetchSlotCounts();
-    // Refresh slot counts periodically to stay in sync with Sheets
-    setInterval(fetchSlotCounts, SLOT_REFRESH_MS);
     
     // Also update display immediately (in case fetch is slow)
     updateSlotDisplay();
@@ -731,25 +766,16 @@
       }
     });
 
-    // Validate event field on blur
-    eventField.addEventListener('blur', () => {
-      const error = validateEvent(eventField.value);
-      if (error) {
-        showFieldError(eventField, eventError, error);
-      } else {
-        clearFieldError(eventField, eventError);
-      }
+    // Clear date error styling on change
+    dateField.addEventListener('change', () => {
+      dateField.classList.remove('error');
+      dateError.textContent = '';
     });
 
     // Clear error styling on input (user is typing)
     nameField.addEventListener('input', () => {
       nameField.classList.remove('error');
       nameError.textContent = '';
-    });
-
-    eventField.addEventListener('input', () => {
-      eventField.classList.remove('error');
-      eventError.textContent = '';
     });
 
     /* ============================================
@@ -789,7 +815,8 @@
         const payload = {
           name: nameField.value.trim(),
           role: selectedRoles.join(', '), // Join multiple roles with comma
-          event: eventField.value.trim(),
+          event: EVENT_NAME,
+          date: dateField.value
         };
 
         // Send data to Google Apps Script Web App
@@ -821,11 +848,7 @@
           
           // Update slot display with data from server response
           if (data.slots) {
-            SLOT_CONFIG.runner.total = data.slots.runner.total;
-            SLOT_CONFIG.runner.taken = data.slots.runner.taken;
-            SLOT_CONFIG.gatekeeper.total = data.slots.gatekeeper.total;
-            SLOT_CONFIG.gatekeeper.taken = data.slots.gatekeeper.taken;
-            updateSlotDisplay();
+            applySlotCounts(data.slots);
           } else {
             // Fallback: fetch slots from backend
             fetchSlotCounts();
