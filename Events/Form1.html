@@ -362,7 +362,9 @@
     
     const FETCH_TIMEOUT_MS = 8000;
     const POST_TIMEOUT_MS = 15000;
+    const SLOT_REFRESH_MS = 3000;
     let slotFetchInFlight = false;
+    let slotRefreshTimer = null;
 
     /**
      * Fetch with timeout to avoid hanging requests
@@ -436,6 +438,21 @@
       } finally {
         slotFetchInFlight = false;
       }
+    }
+
+    function startSlotRefresh() {
+      if (slotRefreshTimer) {
+        return;
+      }
+      slotRefreshTimer = setInterval(fetchSlotCounts, SLOT_REFRESH_MS);
+    }
+
+    function stopSlotRefresh() {
+      if (!slotRefreshTimer) {
+        return;
+      }
+      clearInterval(slotRefreshTimer);
+      slotRefreshTimer = null;
     }
     
     // Note: In production, you may want to fetch slot counts from your backend
@@ -727,12 +744,30 @@
       runnerCheckbox.checked = false;
       gatekeeperCheckbox.checked = false;
       fetchSlotCounts();
+      startSlotRefresh();
     });
     // Fetch slot counts from backend on page load (only when date is selected)
     fetchSlotCounts();
     
     // Also update display immediately (in case fetch is slow)
     updateSlotDisplay();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopSlotRefresh();
+        return;
+      }
+      if (dateField.value) {
+        fetchSlotCounts();
+        startSlotRefresh();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      if (dateField.value) {
+        fetchSlotCounts();
+      }
+    });
 
     /* ============================================
        REAL-TIME VALIDATION
@@ -845,6 +880,8 @@
           // Reset form and clear selections
           form.reset();
           clearAllErrors();
+          stopSlotRefresh();
+          updateSlotDisplay();
           
           // Update slot display with data from server response
           if (data.slots) {
